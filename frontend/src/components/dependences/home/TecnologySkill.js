@@ -46,7 +46,7 @@ const TecnologySkill = ({tecnology}) => {
                 <Typography gutterBottom variant="h5" component="div">
                     {tecnology.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{fontStyle: 'italic'}}>
                     {tecnology.description}
                 </Typography>
             </CardContent>

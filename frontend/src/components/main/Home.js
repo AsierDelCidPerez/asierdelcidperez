@@ -1,4 +1,6 @@
 import { Paper, Typography } from "@mui/material";
+import { Container } from "@mui/system";
+import ImageTriangled from "../dependences/home/ImageTriangled";
 import MainSkills from "../dependences/home/MainSkills"
 import TecnologiesSkills from "../dependences/home/TecnologiesSkills";
 
@@ -46,6 +48,7 @@ const tecnologies = [
   }
 ]
 
+const imagenPortada = "https://i.ibb.co/v1Kftzz/apple-1868496-960-720.png"
 
 const Home = () => {
 
@@ -55,8 +58,20 @@ const Home = () => {
             <br/>
             <br/>
             <br/>
+            <Container sx={{display: {xs: 'none', s: 'none', md: 'block'}}}>
+              <ImageTriangled imageUri={imagenPortada}>
+                <Typography sx={{
+                  fontSize: '10.5rem',
+                  height: '100%',
+                  fontFamily: 'Ms Madi',
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  alignContent: 'center'
+                }}>Simply Modern</Typography>
+              </ImageTriangled>
+            </Container>
             <Paper square sx={{padding: '.5%', textAlign: 'center'}}>
-            <Typography sx={{fontSize:'2rem'}}>Dominio de aptitudes tecnológicas</Typography> </Paper><br/>
+            <Typography sx={{fontSize:'1.5rem'}}>Dominio de aptitudes tecnológicas</Typography> </Paper><br/>
             <TecnologiesSkills tecnologies={tecnologies}/>
             <br/>
         </div>    
