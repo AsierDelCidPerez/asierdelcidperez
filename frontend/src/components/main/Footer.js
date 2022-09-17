@@ -8,30 +8,31 @@ import { Link } from 'react-router-dom';
 import { Grid } from '@mui/material';
 import TerminalIcon from '@mui/icons-material/Terminal'
 
+
 const redesSociales = [
     {
         id: 1,
-        logo: 'https://i.ibb.co/8BQVWkH/211904-social-github-icon.png',
+        logo: 'https://bit.ly/3QTq0ue',
         uri: 'https://github.com/AsierDelCidPerez'
     },
     {
       id: 2,
-      logo: 'https://i.ibb.co/RY9XB2k/104501-twitter-bird-icon.png',
+      logo: 'https://bit.ly/3BNhpVF',
       uri: 'https://twitter.com/adelcidp_175'
     },
     {
       id: 3,
-      logo: 'https://i.ibb.co/YZ6Lm3j/211929-social-youtube-icon.png',
+      logo: 'https://bit.ly/3Uv3WJN',
       uri: 'https://www.youtube.com/channel/UCuTIBAGx8nxUYE5r0-ezt0Q'
     },
     {
       id: 4,
-      logo: 'https://i.ibb.co/h2SRJZ9/1161953-instagram-icon.png',
+      logo: 'https://bit.ly/3dkBMQT',
       uri: 'https://www.instagram.com/adelcidp142/'
     },
     {
       id: 5,
-      logo: 'https://i.ibb.co/qFJyXqs/3671674-badge-icon.png',
+      logo: 'https://bit.ly/3dtMrZk',
       uri: 'https://www.credly.com/users/asier-del-cid-perez/badges'
     }
 ]
@@ -48,10 +49,29 @@ const Footer = () => {
                   {
                     /* Footer para móviles/tablets */
                   }
-                    <Grid container item columns={{xs: 4, s: 8}} xs={4} sx={{display: {md: 'none', s: 'block', xs: 'block'}}}>
-                        
+                  <Container sx={{display: {xs: 'block', s: 'block', md: 'none'}}}>
+                    <Grid container item columns={{xs: 4, s: 8}} spacing={2} xs={4} sx={{display: {md: 'none', s: 'flex', xs: 'flex'}, justifyContent: 'center'}}>
+                      {
+                        redesSociales.map(red => (
+                          <Grid key={red.id} item xs={2} sx={{display: 'flex', justifyContent: 'center'}}>
+                            <a href={red.uri} target="_blank" rel="noreferrer"><Box component="img" src={red.logo} sx={{width: 50, cursor: 'pointer'}}/></a>
+                            { /* <Box component="img" src={red.logo} sx={{width: 50, cursor: 'pointer'}} onClick={() => window.location.href = red.uri}></Box> */ }
+                          </Grid>
+                          ))
+                        }
                     </Grid>
-
+                    <div style={{textAlign: 'center', margin: '3%'}}>
+                          <Typography style={{
+                            whiteSpace: 'initial',
+                            textAlign: 'center',
+                            padding: '1%',
+                            fontFamily: 'Cascadia Code'
+                          }} class="tippingAction">Asier Del Cid Pérez</Typography>
+                          <div style={{display: 'flex', justifyContent: 'center'}}>
+                          <TerminalIcon sx={{fontSize: 35}}/>
+                          </div>
+                      </div>
+                    </Container>
                     {
                       /* Footer para PCs */ 
                     }

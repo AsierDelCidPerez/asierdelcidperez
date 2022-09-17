@@ -5,7 +5,7 @@ import LanguageGrafica from "../dependences/home/LanguageGrafica";
 import MainSkills from "../dependences/home/MainSkills"
 import TecnologiesSkills from "../dependences/home/TecnologiesSkills";
 import { Box } from "@mui/system";
-// Relación de las imagenes w/h = 1,6
+// Relación de las imagenes w/h = 1,6 y 950w
 
 // Recogeremos los arrays de la BBDD
 
@@ -13,22 +13,22 @@ const images = [
   {
     label: 'Ingeniero asociado a Microsoft en Inteligencia Artificial',
     imgPath:
-      'https://i.ibb.co/tcmVJrX/Azure-AI-Engineer-Associate.png',
+      'https://bit.ly/3RTvAOy',
   },
   {
     label: 'Desarrollador web moderno especializado en MERN',
     imgPath:
-      'https://i.ibb.co/w40TSWz/certificate-fullstack-1.png',
+      'https://bit.ly/3f1dZ9b',
   },
   {
     label: 'Certificado en Oracle Cloud Infrastructure',
     imgPath:
-      'https://i.ibb.co/2y4cyWp/Screenshot-2022-09-16-at-15-53-12-e-Certificate-pdf.png',
+      'https://bit.ly/3DxJG3P',
   },
   {
     label: 'Certificado por Microsoft en varios campos',
     imgPath:
-      'https://i.ibb.co/Ks0DVWQ/certificaciones-varias-microsoft.png',
+      'https://bit.ly/3eYD3xt',
   },
 ];
 
@@ -36,14 +36,14 @@ const tecnologies = [
   {
     id: 2,
     title: 'Java',
-    uri: 'https://i.ibb.co/5vvqTQM/java-1.png',
+    uri: 'https://bit.ly/3BotVcV',
     description: 'Alta experiencia en Java SE en resolución de problemas, así como en Java EE para la programación web.',
     skill: 5
   },
   {
     id: 1,
     title: 'C#',
-    uri: 'https://i.ibb.co/xFfg6jd/csharp9.png',
+    uri: 'https://bit.ly/3Bou7Jb',
     description: 'Experiencia elevada en C# en resolución de problemas y alta experiencia en desarrollo machine learning (en especial inteligencia artificial) en el mismo.',
     skill: 4
   }
@@ -68,6 +68,20 @@ const Home = () => {
               sm: 'none',
               xs: 'none',
               md: 'block'
+            }
+          }}/>
+          <Box sx={{
+            clipPath: "polygon(0 85%, 100% 0, 78% 100%, 67% 53%)",
+            background: "linear-gradient(220.55deg, #3793FF 0%, #0017E4 100%)",
+            position: "absolute",
+            zIndex: -1,
+            width: "100%",
+            right: '0%',
+            height: "170%",
+            display: {
+              sm: 'block',
+              xs: 'block',
+              md: 'none'
             }
           }}/>
             <MainSkills images={images}/>
