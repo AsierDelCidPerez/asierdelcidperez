@@ -28,6 +28,11 @@ const redesSociales = [
       id: 4,
       logo: 'https://i.ibb.co/h2SRJZ9/1161953-instagram-icon.png',
       uri: 'https://www.instagram.com/adelcidp142/'
+    },
+    {
+      id: 5,
+      logo: 'https://i.ibb.co/qFJyXqs/3671674-badge-icon.png',
+      uri: 'https://www.credly.com/users/asier-del-cid-perez/badges'
     }
 ]
 

@@ -1,9 +1,10 @@
 import { Paper, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import ImageTriangled from "../dependences/home/ImageTriangled";
+import LanguageGrafica from "../dependences/home/LanguageGrafica";
 import MainSkills from "../dependences/home/MainSkills"
 import TecnologiesSkills from "../dependences/home/TecnologiesSkills";
-
+import { Box } from "@mui/system";
 // Relación de las imagenes w/h = 1,6
 
 // Recogeremos los arrays de la BBDD
@@ -48,16 +49,32 @@ const tecnologies = [
   }
 ]
 
+
 const imagenPortada = "https://i.ibb.co/v1Kftzz/apple-1868496-960-720.png"
 
 const Home = () => {
 
     return (
         <div>
+          <Box sx={{
+            clipPath: "polygon(73% 75%, 100% 0, 100% 100%, 75% 100%, 0 100%, 47% 77%, 0 0)",
+            background: "linear-gradient(220.55deg, #3793FF 0%, #0017E4 100%)",
+            position: "absolute",
+            zIndex: -1,
+            width: "120%",
+            right: '0%',
+            height: "80%",
+            display: {
+              sm: 'none',
+              xs: 'none',
+              md: 'block'
+            }
+          }}/>
             <MainSkills images={images}/>
             <br/>
             <br/>
             <br/>
+            { /*
             <Container sx={{display: {xs: 'none', s: 'none', md: 'block'}}}>
               <ImageTriangled imageUri={imagenPortada}>
                 <Typography sx={{
@@ -70,9 +87,14 @@ const Home = () => {
                 }}>Simply Modern</Typography>
               </ImageTriangled>
             </Container>
+            */
+            }
+
             <Paper square sx={{padding: '.5%', textAlign: 'center'}}>
             <Typography sx={{fontSize:'1.5rem'}}>Dominio de aptitudes tecnológicas</Typography> </Paper><br/>
             <TecnologiesSkills tecnologies={tecnologies}/>
+            <br/>
+            <LanguageGrafica/>
             <br/>
         </div>    
     )
