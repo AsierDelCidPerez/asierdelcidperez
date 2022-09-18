@@ -13,22 +13,22 @@ const images = [
   {
     label: 'Ingeniero asociado a Microsoft en Inteligencia Artificial',
     imgPath:
-      'https://bit.ly/3RTvAOy',
+      'https://i.imgur.com/7GgS9TX.png',
   },
   {
     label: 'Desarrollador web moderno especializado en MERN',
     imgPath:
-      'https://bit.ly/3f1dZ9b',
+      'https://i.imgur.com/6DB3I3k.png',
   },
   {
     label: 'Certificado en Oracle Cloud Infrastructure',
     imgPath:
-      'https://bit.ly/3DxJG3P',
+      'https://i.imgur.com/HH6dJmX.png',
   },
   {
     label: 'Certificado por Microsoft en varios campos',
     imgPath:
-      'https://bit.ly/3eYD3xt',
+      'https://i.imgur.com/1jRTIQO.png',
   },
 ];
 
@@ -36,14 +36,14 @@ const tecnologies = [
   {
     id: 2,
     title: 'Java',
-    uri: 'https://bit.ly/3BotVcV',
+    uri: 'https://i.imgur.com/IDV3aib.png',
     description: 'Alta experiencia en Java SE en resolución de problemas, así como en Java EE para la programación web.',
     skill: 5
   },
   {
     id: 1,
     title: 'C#',
-    uri: 'https://bit.ly/3Bou7Jb',
+    uri: 'https://i.imgur.com/tkD6Txw.png',
     description: 'Experiencia elevada en C# en resolución de problemas y alta experiencia en desarrollo machine learning (en especial inteligencia artificial) en el mismo.',
     skill: 4
   }

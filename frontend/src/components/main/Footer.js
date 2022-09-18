@@ -12,27 +12,27 @@ import TerminalIcon from '@mui/icons-material/Terminal'
 const redesSociales = [
     {
         id: 1,
-        logo: 'https://bit.ly/3QTq0ue',
+        logo: 'https://i.imgur.com/a3TvGcf.png',
         uri: 'https://github.com/AsierDelCidPerez'
     },
     {
       id: 2,
-      logo: 'https://bit.ly/3BNhpVF',
+      logo: 'https://i.imgur.com/PqaWaDq.png',
       uri: 'https://twitter.com/adelcidp_175'
     },
     {
       id: 3,
-      logo: 'https://bit.ly/3Uv3WJN',
+      logo: 'https://i.imgur.com/HiZ4JT1.png',
       uri: 'https://www.youtube.com/channel/UCuTIBAGx8nxUYE5r0-ezt0Q'
     },
     {
       id: 4,
-      logo: 'https://bit.ly/3dkBMQT',
+      logo: 'https://i.imgur.com/Nvpey5H.png',
       uri: 'https://www.instagram.com/adelcidp142/'
     },
     {
       id: 5,
-      logo: 'https://bit.ly/3dtMrZk',
+      logo: 'https://i.imgur.com/6z29UxS.png',
       uri: 'https://www.credly.com/users/asier-del-cid-perez/badges'
     }
 ]

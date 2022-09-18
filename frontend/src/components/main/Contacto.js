@@ -1,28 +1,43 @@
-import { Button } from "@mui/material"
-import FormFile from "../dependences/inputs/FormFile"
+import { Button, LinearProgress, Box } from "@mui/material"
 import axios from 'axios'
+import useImageService from "../../services/images"
+import uris from '../../urls/uris'
+import { useState } from "react"
+import useFormField from "../dependences/inputs/FormFile"
 
 const Contacto = () => {
-    const contactar = event => {
+    const [loading, setLoading] = useState(false)
+    const images = useImageService(uris.imageControllerUri)
+    const multiple = true
+    const formField = useFormField({name:'adjunto', acceptedExtensions: ["png", "jpeg", "jpg"], multiple})
+
+    const contactar = async event => {
         event.preventDefault()
-        const FD = new FormData()
+        const form = new FormData()
         const adjuntos = event.target.adjunto.files
         let urlsImages = []
         var urlCreator = window.URL || window.webkitURL;
         for(let file of adjuntos){
-            urlsImages = urlsImages.concat(urlCreator.createObjectURL(file))
+            form.append("images", file)
         }
         urlsImages.forEach(url => {
             window.open(url)
             console.log(url)
+        })
+        setLoading(true)
+        images.uploadImage(form).then(res => {
+            setLoading(false)
         })
         urlsImages.forEach(url => {
             urlCreator.revokeObjectURL(url)
         })
     }
     return (
-        <form onSubmit={contactar}>
-            <FormFile name="adjunto"/>
+        <form onSubmit={contactar}> 
+            <Box sx={{ width: '100%', display: loading ? 'block' : 'none'}}>
+                <LinearProgress />
+            </Box>
+            {formField.getUploadFile()}
             <Button type="submit" variant="contained">Submit</Button>
             <br/><br/>
         </form>
