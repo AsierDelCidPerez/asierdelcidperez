@@ -6,6 +6,7 @@ import Conoceme from './components/main/Conoceme';
 import { Container } from '@mui/material';
 import Home from './components/main/Home';
 import Footer from './components/main/Footer';
+import Contacto from './components/main/Contacto';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Container>
       <Routes>
         <Route path="/conoceme" element={<Conoceme/>}/>
+        <Route path="/contactar" element={<Contacto/>}/>
         <Route path="/" element={<Home/>}/>
       </Routes>
       </Container>

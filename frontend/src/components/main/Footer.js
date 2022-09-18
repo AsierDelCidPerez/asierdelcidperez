@@ -66,7 +66,7 @@ const Footer = () => {
                             textAlign: 'center',
                             padding: '1%',
                             fontFamily: 'Cascadia Code'
-                          }} class="tippingAction">Asier Del Cid Pérez</Typography>
+                          }} className="tippingAction">Asier Del Cid Pérez</Typography>
                           <div style={{display: 'flex', justifyContent: 'center'}}>
                           <TerminalIcon sx={{fontSize: 35}}/>
                           </div>

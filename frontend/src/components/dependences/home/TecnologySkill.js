@@ -53,7 +53,7 @@ const TecnologySkill = ({tecnology}) => {
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
                     {
-                        getStars()
+                        tecnology.skill !== -1 ? getStars() : ''
                     }
                 </Typography>
             </CardContent>

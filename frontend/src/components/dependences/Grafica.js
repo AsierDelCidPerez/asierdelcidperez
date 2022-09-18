@@ -31,7 +31,7 @@ const Grafica = ({data, width, height, lineCharts}) => {
           <Legend />
           {
             lineCharts.map(line => (
-                <Line key={line.id} type="linear" {...line} unit='%' />
+                <Line key={line.id} dot={false} type="monotone" {...line} unit='%' />
               ))
           }
         </LineChart>
