@@ -53,10 +53,9 @@ const tecnologies = [
 const imagenPortada = "https://i.ibb.co/v1Kftzz/apple-1868496-960-720.png"
 
 const Home = () => {
-
     return (
         <div>
-          <Box sx={{
+          <Box className="animate__animated animate__zoomIn" sx={{
             clipPath: "polygon(73% 75%, 100% 0, 100% 100%, 75% 100%, 0 100%, 47% 77%, 0 0)",
             background: "linear-gradient(220.55deg, #3793FF 0%, #0017E4 100%)",
             position: "absolute",

@@ -10,9 +10,11 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
         dragOver: false,
         incorrect: false
     })
+    const image = useImageService(uris.imageControllerUri)
     const [files, setFiles] = useState([])
+    const [links, setLinks] = useState([])
 
-    let links = []
+    // Configuracion extensiones permitidas
     let extensions = ".("
     acceptedExtensions.forEach(extension => {
         extensions += (extension + "|")
@@ -21,6 +23,8 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
     extensions = extensions.substring(0, extensions.length-1)
     extensions += ")$"
     const acceptedPattern = new RegExp(extensions)
+    /**/
+
     const dragOver = (valor) => {
         return event => {
             event.preventDefault()
@@ -31,12 +35,23 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
         }
     }
 
+    const subirArchivos = async archivos => {
+        let promesas = []
+        for(let file of archivos){
+            const form = new FormData()
+            form.append("images", file)
+            promesas = promesas.concat(image.uploadImage(form))
+        }
+        return (await Promise.all(promesas)).map(res => res.data[0])
+    }
+
     const dropItems = async event => {
         event.preventDefault()
         // setLoading(true)
         let permitido = true;
-        for(let i=0;i<event.dataTransfer.files.length;i++){
-            if(!event.dataTransfer.files[i].name.match(acceptedPattern)){
+        const archivos = event.dataTransfer ? event.dataTransfer.files : event.target.files
+        for(let i=0;i<archivos.length;i++){
+            if(!archivos[i].name.match(acceptedPattern)){
                 permitido = false
             }
         }
@@ -45,7 +60,12 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
                 ...styles,
                 incorrect: false
             })
-            setFiles(event.dataTransfer.files)
+            setLoading(true)
+            subirArchivos(archivos).then(res => {
+                setLoading(false)
+                setLinks(res)
+                setFiles(archivos)
+            })
         }
         else {
             setStyles({
@@ -53,6 +73,7 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
                 incorrect: true
             })
             setFiles([])
+            setLinks([])
             setTimeout(() => setStyles({
                 ...styles,
                 dragOver: false,
@@ -73,6 +94,7 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
         }
     }
 
+    // Mensaje de error si uploading es INCORRECT
     const getLeyenda = () => {
         let extensions = "";
         acceptedExtensions.forEach(extension => extensions += (extension + ", "))
@@ -82,10 +104,14 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
         )
     }
 
+    // Saber si un archivo es una imagen (tenga extension .png | .jpeg | .jpg)
     const isAnImage = name => {
         return name.match(new RegExp(".(.png|jpeg|jpg)$"))
     }
 
+    
+    // Obtener lista de archivos (con miniatura si es imagen)
+    let myLinks = []
     const getFileList = () => {
         links.forEach(link => URL.revokeObjectURL(link))
         try {
@@ -98,20 +124,23 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
                 {
                     elems.map((elem, index) => {
                         const link = URL.createObjectURL(elem)
-                        links = links.concat(link)
+                        myLinks = myLinks.concat(link)
                         return (<li key={index}>{isAnImage(elem.name) ? <img src={link} width="3%"/> : ''}&nbsp;{elem.name} ({Math.round(elem.size/1024)}KB)</li>)
                     }
                     )
                 }
-                {
-
-}
             </>
             )
         }catch(err){
             
         }
     }
+
+    const resetFiles = () => {
+        setFiles([])
+        setLinks([])
+    }
+
     const multiplicidad = multiple ? {'multiple': true} : {}
     const getUploadFile = () => (
         <div style={{
@@ -135,6 +164,7 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
                     <input
                         type="file"
                         hidden
+                        onChange={dropItems}
                         {...multiplicidad}
                         name={name}
                 />
@@ -154,7 +184,7 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
     )
 
     return {
-        getUploadFile, files, loading
+        getUploadFile, loading, links, resetFiles
     }
 }
 

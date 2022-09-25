@@ -1,5 +1,6 @@
 @import url("https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/cascadia-code.min.css");
 @import url('https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap');
+@import url('./animate.css');
 
 body {
   margin: 0;

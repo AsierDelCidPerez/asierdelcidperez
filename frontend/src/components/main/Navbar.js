@@ -11,6 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import { Divider, ListItemIcon, ListItemText } from '@mui/material';
 import TerminalIcon from '@mui/icons-material/Terminal';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -29,13 +30,13 @@ Estructura de una page/setting
 const pages = [
     {
         id: 1,
-        name: 'Products',
-        uri: '/#1'
+        name: 'Contactar',
+        uri: '/contactar'
     },
     {
         id: 2,
-        name: 'Pricing',
-        uri: '/#2'
+        name: 'Documentación',
+        uri: '/legal'
     },
     {
         id: 3,
@@ -47,22 +48,21 @@ const settings = [
   {
     id: 1,
     name: 'Profile',
-    uri: '/settings/profile'
+    uri: '/settings/profile',
+    icon: "fa-solid fa-user"
   }, 
   {
     id: 2,
-    name: 'Account',
-    uri: '/settings/account'
+    name: 'Dashboard',
+    uri: '/settings/dashboard',
+    icon: "fa-solid fa-table-columns"
   },
   {
     id: 3,
-    name: 'Dashboard',
-    uri: '/settings/dashboard'
-  },
-  {
-    id: 4,
+    divided: true,
     name: 'Logout',
-    uri: '/actions/logout'
+    uri: '/actions/logout',
+    icon: "fa-solid fa-right-from-bracket"
   }
 ];
 
@@ -86,6 +86,17 @@ const Navbar = () => {
       setAnchorElUser(null);
     };
 
+    const getBodyOfSetting = page => {
+        return (
+          <>
+            <ListItemIcon>
+              {page.icon ? <i className={page.icon} /> : ""}
+            </ListItemIcon>
+            <ListItemText>{page.name}</ListItemText>
+          </>
+        )
+  }
+
     return (
       <>
       <AppBar position="static">
@@ -98,8 +109,8 @@ const Navbar = () => {
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="/"
+              component={Link}
+              to="/"
               sx={{
                 mr: 2,
                 display: { xs: 'none', md: 'flex' },
@@ -144,6 +155,7 @@ const Navbar = () => {
               >
                 {pages.map((page) => (
                   <MenuItem key={page.id} onClick={() => navigate(page.uri)}>
+                    getBodyOfPage(page)
                     <Typography textAlign="center">{page.name}</Typography>
                   </MenuItem>
                 ))}
@@ -214,9 +226,12 @@ const Navbar = () => {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
+                  <div key={setting.id}>
+                  {setting.divided ? <Divider/> : ''}
                   <MenuItem key={setting.id} onClick={() => navigate(setting.uri)}>
-                    <Typography textAlign="center">{setting.name}</Typography>
+                    {getBodyOfSetting(setting)}
                   </MenuItem>
+                  </div>
                 ))}
               </Menu>
             </Box>
