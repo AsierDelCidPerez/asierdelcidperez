@@ -18,7 +18,6 @@ const style = {
 };
 
 export default function MyModal({open, handleOpen=()=>{}, handleClose=()=>{}, getBody=()=><></>}) {
-
   return (
     <div>
       <Modal

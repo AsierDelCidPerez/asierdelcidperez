@@ -2,7 +2,7 @@
 import { Card, CardMedia, CardContent, Typography, CardActions, Button } from "@mui/material"
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Blog = ({blog}) => {
     const getStars = () => {
@@ -31,6 +31,11 @@ const Blog = ({blog}) => {
             alt="green iguana"
         />
         <CardContent>
+            <div style={{display: 'flex', justifyContent: 'right'}}>
+                <Typography variant="body2" component="span">
+                    {blog.fecha}
+                </Typography>
+            </div>
             <Typography gutterBottom variant="h5" component="div">
                 {blog.title}
             </Typography>
@@ -45,8 +50,8 @@ const Blog = ({blog}) => {
                 }
             </Typography>
         </CardContent>
-        <CardActions>
-            <Button size="small" component={<Link/>} to={`/blogs/${blog.id}`}>Ver más</Button>
+        <CardActions sx={{display: 'flex', justifyContent: 'center'}}>
+            <Button size="small" component={Link} to={`/blogs/${blog.id}`}>Ver más</Button>
         </CardActions>
     </Card>
     )

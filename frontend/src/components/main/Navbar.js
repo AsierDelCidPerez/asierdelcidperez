@@ -11,10 +11,11 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { Divider, ListItemIcon, ListItemText } from '@mui/material';
+import { Divider, ListItemIcon, ListItemText, TextField } from '@mui/material';
 import TerminalIcon from '@mui/icons-material/Terminal';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import MyModal from '../dependences/others/MyModal';
 /*
 
 Estructura de una page/setting
@@ -41,7 +42,7 @@ const pages = [
     {
         id: 3,
         name: 'Blog',
-        uri: '/#3'
+        uri: '/blogs'
     }
 ];
 const settings = [
@@ -70,7 +71,8 @@ const Navbar = () => {
     const navigate = useNavigate()
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
-  
+    const [isLoggingIn, setLoggingIn] = React.useState(false)
+    const loggedIn = false
     const handleOpenNavMenu = (event) => {
       setAnchorElNav(event.currentTarget);
     };
@@ -97,8 +99,80 @@ const Navbar = () => {
         )
   }
 
+  const getAvatarInfo = () => (
+    <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" >A</Avatar>
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <div key={setting.id}>
+                  {setting.divided ? <Divider/> : ''}
+                  <MenuItem key={setting.id} onClick={() => navigate(setting.uri)}>
+                    {getBodyOfSetting(setting)}
+                  </MenuItem>
+                  </div>
+                ))}
+              </Menu>
+            </Box>
+  )
+
+  const toggleLogin = () => setLoggingIn(!isLoggingIn)
+
+  const getLoginButton = () => (
+    <Button color="inherit" onClick={toggleLogin}>Acceder</Button>
+  )
+  const getLoginForm = () => (
+    <Box component="form" sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
+    <h1>Acceder</h1>
+      <TextField fullwidth variant="outlined" autoComplete='off' label="Email"/><br/>
+      <TextField fullwidth type="password" variant="outlined" label="Contraseña"/>
+      <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
+        <Link to="#">¿Has olvidado la contraseña?</Link>
+        <Link to="#">¿No tienes cuenta? Registrarse</Link>
+      </div>
+      <Button fullwidth variant="contained">Acceder</Button>
+  </Box>
+  )
+  const getSignInForm = () => (
+    <Box component="form" sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
+    <h1>Registrarse</h1>
+      <TextField fullwidth variant="outlined" autoComplete='off' label="Email"/><br/>
+      <TextField fullwidth type="password" variant="outlined" label="Contraseña"/>
+      <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
+        <Link to="#">¿Has olvidado la contraseña?</Link>
+        <Link to="#">¿No tienes cuenta? Registrarse</Link>
+      </div>
+      <Button fullwidth variant="contained">Acceder</Button>
+  </Box>
+  )
     return (
       <>
+      <MyModal open={isLoggingIn} handleClose={toggleLogin} getBody={() => (
+        <>
+        <div style={{display: 'flex', justifyContent: 'right'}}>
+          <TerminalIcon/>
+        </div>
+        {getLoginForm()}
+        </>
+      )}/>
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
@@ -155,7 +229,6 @@ const Navbar = () => {
               >
                 {pages.map((page) => (
                   <MenuItem key={page.id} onClick={() => navigate(page.uri)}>
-                    getBodyOfPage(page)
                     <Typography textAlign="center">{page.name}</Typography>
                   </MenuItem>
                 ))}
@@ -203,38 +276,8 @@ const Navbar = () => {
             /* Avatar de usuario y onClick Menu*/
             }
 
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" >A</Avatar>
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {settings.map((setting) => (
-                  <div key={setting.id}>
-                  {setting.divided ? <Divider/> : ''}
-                  <MenuItem key={setting.id} onClick={() => navigate(setting.uri)}>
-                    {getBodyOfSetting(setting)}
-                  </MenuItem>
-                  </div>
-                ))}
-              </Menu>
-            </Box>
+            {loggedIn ? getAvatarInfo() : getLoginButton()}
+            
           </Toolbar>
         </Container>
       </AppBar>  

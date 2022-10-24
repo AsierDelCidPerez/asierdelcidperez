@@ -10,6 +10,9 @@ import Contacto from './components/main/Contacto';
 import Notification from './components/main/Notification';
 import Documentation from './components/main/Documentation';
 import 'https://kit.fontawesome.com/c86d60ac91.js'
+import Blogs from './components/main/Blogs';
+import ABlog from './components/main/ABlog';
+import Login from './components/main/Login';
 
 function App() {
   return (
@@ -18,6 +21,9 @@ function App() {
       <Container>
       <Notification/>
       <Routes>
+        <Route path="/auth/login" element={<Login/>}/>
+        <Route path="/blogs/:id" element={<ABlog/>}/>
+        <Route path="/blogs" element={<Blogs/>}/>
         <Route path="/conoceme" element={<Conoceme/>}/>
         <Route path="/contactar" element={<Contacto/>}/>
         <Route path="/legal" element={<Documentation/>}/>
