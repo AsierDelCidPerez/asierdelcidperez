@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import MyModal from '../dependences/others/MyModal';
 import { getLogin as getLoginForm } from '../dependences/auth/login/Login';
+import { getSignIn as getSignInForm } from '../dependences/auth/login/SignIn';
 
 /*
 
@@ -144,27 +145,11 @@ const Navbar = () => {
   const getLoginButton = () => (
     <Button color="inherit" onClick={toggleLogin}>Acceder</Button>
   )
-
-  const getSignInForm = () => (
-    <Box component="form" sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
-    <h1>Registrarse</h1>
-      <TextField fullwidth variant="outlined" autoComplete='off' label="Email"/><br/>
-      <TextField fullwidth type="password" variant="outlined" label="Contraseña"/>
-      <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
-        <Link to="#">¿Has olvidado la contraseña?</Link>
-        <Link to="#" onClick={toggleLikeRegistering}>¿Has cambiado de idea? Acceder</Link>
-      </div>
-      <Button fullwidth variant="contained">Acceder</Button>
-  </Box>
-  )
     return (
       <>
       <MyModal open={isLoggingIn} handleClose={toggleLogin} getBody={() => (
         <>
-        <div style={{display: 'flex', justifyContent: 'right'}}>
-          <TerminalIcon/>
-        </div>
-        {likeRegistering ? getSignInForm() : getLoginForm(toggleLikeRegistering)}
+        {likeRegistering ? getSignInForm(toggleLikeRegistering) : getLoginForm(toggleLikeRegistering)}
         </>
       )}/>
       <AppBar position="static">
@@ -173,7 +158,8 @@ const Navbar = () => {
             { 
             /* Logo */ 
             }
-            <TerminalIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+              <img src="./logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => navigate('/')}/>
+            {/*}
             <Typography
               variant="h6"
               noWrap
@@ -190,7 +176,7 @@ const Navbar = () => {
               }}
             >
               ASIER
-            </Typography>
+            </Typography> {*/}
   
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
