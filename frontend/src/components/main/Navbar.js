@@ -16,6 +16,8 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import MyModal from '../dependences/others/MyModal';
+import { getLogin as getLoginForm } from '../dependences/auth/login/Login';
+
 /*
 
 Estructura de una page/setting
@@ -72,6 +74,7 @@ const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [isLoggingIn, setLoggingIn] = React.useState(false)
+    const [likeRegistering, setLikeRegistering] = React.useState(false);
     const loggedIn = false
     const handleOpenNavMenu = (event) => {
       setAnchorElNav(event.currentTarget);
@@ -136,21 +139,12 @@ const Navbar = () => {
 
   const toggleLogin = () => setLoggingIn(!isLoggingIn)
 
+  const toggleLikeRegistering = () => setLikeRegistering(!likeRegistering)
+
   const getLoginButton = () => (
     <Button color="inherit" onClick={toggleLogin}>Acceder</Button>
   )
-  const getLoginForm = () => (
-    <Box component="form" sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
-    <h1>Acceder</h1>
-      <TextField fullwidth variant="outlined" autoComplete='off' label="Email"/><br/>
-      <TextField fullwidth type="password" variant="outlined" label="Contraseña"/>
-      <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
-        <Link to="#">¿Has olvidado la contraseña?</Link>
-        <Link to="#">¿No tienes cuenta? Registrarse</Link>
-      </div>
-      <Button fullwidth variant="contained">Acceder</Button>
-  </Box>
-  )
+
   const getSignInForm = () => (
     <Box component="form" sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
     <h1>Registrarse</h1>
@@ -158,7 +152,7 @@ const Navbar = () => {
       <TextField fullwidth type="password" variant="outlined" label="Contraseña"/>
       <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
         <Link to="#">¿Has olvidado la contraseña?</Link>
-        <Link to="#">¿No tienes cuenta? Registrarse</Link>
+        <Link to="#" onClick={toggleLikeRegistering}>¿Has cambiado de idea? Acceder</Link>
       </div>
       <Button fullwidth variant="contained">Acceder</Button>
   </Box>
@@ -170,7 +164,7 @@ const Navbar = () => {
         <div style={{display: 'flex', justifyContent: 'right'}}>
           <TerminalIcon/>
         </div>
-        {getLoginForm()}
+        {likeRegistering ? getSignInForm() : getLoginForm(toggleLikeRegistering)}
         </>
       )}/>
       <AppBar position="static">

@@ -1,8 +1,5 @@
 
 
-const Login = () => {
-
+export const getLogin = () => {
 
 }
-
-export default Login
