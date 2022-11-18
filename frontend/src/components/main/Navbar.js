@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import MyModal from '../dependences/others/MyModal';
 import { getLogin as getLoginForm } from '../dependences/auth/login/Login';
-import { getSignIn as getSignInForm } from '../dependences/auth/login/SignIn';
+import SignIn from '../dependences/auth/login/SignIn';
 
 /*
 
@@ -85,10 +85,12 @@ const Navbar = () => {
     };
   
     const handleCloseNavMenu = () => {
+      setLikeRegistering(false)
       setAnchorElNav(null);
     };
   
     const handleCloseUserMenu = () => {
+      setLikeRegistering(false)
       setAnchorElUser(null);
     };
 
@@ -138,7 +140,10 @@ const Navbar = () => {
             </Box>
   )
 
-  const toggleLogin = () => setLoggingIn(!isLoggingIn)
+  const toggleLogin = () => {
+    setLoggingIn(!isLoggingIn)
+    if(!loggedIn) setLikeRegistering(false)
+  }
 
   const toggleLikeRegistering = () => setLikeRegistering(!likeRegistering)
 
@@ -149,7 +154,7 @@ const Navbar = () => {
       <>
       <MyModal open={isLoggingIn} handleClose={toggleLogin} getBody={() => (
         <>
-        {likeRegistering ? getSignInForm(toggleLikeRegistering) : getLoginForm(toggleLikeRegistering)}
+        {likeRegistering ? <SignIn toggleLikeRegistering={toggleLikeRegistering}/> : getLoginForm(toggleLikeRegistering)}
         </>
       )}/>
       <AppBar position="static">
@@ -158,7 +163,7 @@ const Navbar = () => {
             { 
             /* Logo */ 
             }
-              <img src="./logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => navigate('/')}/>
+              <img src="/logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => navigate('/')}/>
             {/*}
             <Typography
               variant="h6"

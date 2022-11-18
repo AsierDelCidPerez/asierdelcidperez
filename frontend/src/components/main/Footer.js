@@ -87,26 +87,8 @@ const Footer = () => {
                     </Grid>
 
                     <Grid item xs={4} sx={{display: {s: 'none', xs: 'none', md: 'flex', flexDirection:"column", alignItems: 'center'}}}>
-                      <div style={{display: 'flex'}}>
-                        <TerminalIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, fontSize: 60}}/>&nbsp;
-                        <Typography
-                          variant="h6"
-                          noWrap
-                          component={Link}
-                          to="/"
-                          sx={{
-                            mr: 2,
-                            fontSize: 40,
-                            display: { xs: 'none', md: 'flex' },
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'inherit',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          ASIER
-                        </Typography>
+                      <div style={{display: 'flex', justifyContent: 'center'}}>
+                        <img src="/logoBlanco.png" width="23%"/>
                       </div>
                       <Typography
                         variant="p"
