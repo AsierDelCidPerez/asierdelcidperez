@@ -22,11 +22,14 @@ server.start().then(() => {
     server.applyMiddleware({app})
 })
 
+app.use('/api/images', imageRouter)
+app.use(express.static('build'))
+
+app.get('/prueba', (req, res) => res.json({"Buenos dias": "ok"}))
+
 app.get('/uploads/:id', (req, res) => {
     const id = req.params.id
     res.sendFile(__dirname + `/uploads/${id}`)
 })
-
-app.use('/api/images', imageRouter)
 
 module.exports = app
