@@ -14,6 +14,7 @@ const server = new ApolloServer({
     typeDefs, resolvers
 })
 var bodyParser = require('body-parser')
+const tokenRouter = require('./controllers/tokens')
 mongoose.connect(settings.MONGODB_URI).then(() => console.log("Connected to MONGODB"))
 
 bodyParser.json([this.options])
@@ -22,6 +23,7 @@ app.use(cors())
 
 app.use('/api/images', imageRouter)
 app.use('/api/users', userController)
+app.use('/api/tokens', tokenRouter)
 app.use(express.static('build'))
 
 app.use(errorHandling)

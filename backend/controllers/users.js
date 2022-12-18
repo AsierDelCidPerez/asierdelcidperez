@@ -4,6 +4,7 @@ const user = require('../model/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const settings = require('../utils/settings')
+const {existeUsuario} = require('./helpers/users')
 
 const validarContrasena = password => {
     if(!password.match(/\W/)) return false
@@ -23,12 +24,24 @@ const validacionDatos = ({name, apellidos, email, password}) => {
     return false
 }
 
+userRouter.get('/exists', async(req, res) => {
+    const email = req.body.email
+    const usuario = await existeUsuario(email)
+    if(usuario){
+        res.status(200).send(usuario)
+    }else{
+        res.status(400).send({exists: false})
+    }
+})
+
+
 userRouter.post('/login', async(req, res) => {
     const {email, password} = req.body
     const usuario = await user.findOne({email})
     if(usuario){
         if(await bcrypt.compare(password, usuario.passwordHash)){
-            const token = jwt.sign({value: {name: usuario.name, apellidos: usuario.apellidos, email: usuario.email}, date: new Date(), ip: req.ip}, settings.SECRET)
+            const ip = await bcrypt.hash(req.ip, 10)
+            const token = jwt.sign({value: {name: usuario.name, apellidos: usuario.apellidos, email: usuario.email}, date: new Date(), ip}, settings.SECRET)
             res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email})
         }else{
             res.status(404).send({error: 'Contraseña incorrecta'})

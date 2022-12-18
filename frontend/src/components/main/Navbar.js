@@ -19,6 +19,7 @@ import MyModal from '../dependences/others/MyModal';
 import LoginForm from '../dependences/auth/login/Login';
 import SignIn from '../dependences/auth/login/SignIn';
 import { useNotification } from '../dependences/others/Notification';
+import { useSelector } from 'react-redux';
 
 /*
 
@@ -79,6 +80,8 @@ const Navbar = () => {
     const notification = useNotification()
     const [likeRegistering, setLikeRegistering] = React.useState(false);
     const loggedIn = false
+    const user = useSelector(state => state.user)
+
     const handleOpenNavMenu = (event) => {
       setAnchorElNav(event.currentTarget);
     };
@@ -154,8 +157,9 @@ const Navbar = () => {
     toggleLikeRegistering
   }
 
+
   const getTheModal = () => (
-    <MyModal open={isLoggingIn} handleClose={toggleLogin} getBody={() => (
+    <MyModal open={isLoggingIn && !user} handleClose={toggleLogin} getBody={() => (
       <>
       {likeRegistering ? <SignIn {...properties}/> : <LoginForm {...properties}/>}
       </>
@@ -272,7 +276,7 @@ const Navbar = () => {
             /* Avatar de usuario y onClick Menu*/
             }
 
-            {loggedIn ? getAvatarInfo() : getLoginButton()}
+            {user ? getAvatarInfo() : getLoginButton()}
             
           </Toolbar>
         </Container>

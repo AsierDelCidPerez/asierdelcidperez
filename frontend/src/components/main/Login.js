@@ -4,6 +4,7 @@ import SignIn from "../dependences/auth/login/SignIn"
 import LoginForm from "../dependences/auth/login/Login"
 import { useNavigate } from "react-router-dom"
 import { useNotification } from "../dependences/others/Notification"
+import { useSelector } from 'react-redux'
 
 const Login = () => {
     const [loggingIn, setLoggingIn] = React.useState(true)
@@ -22,9 +23,11 @@ const Login = () => {
       toggleLikeRegistering, notification
     }
 
+    const user = useSelector(state => state.user)
+
     return (
         <div>
-        <MyModal open={loggingIn} handleClose={toggleLogin} getBody={() => (
+        <MyModal open={loggingIn && !user} handleClose={toggleLogin} getBody={() => (
         <>
         {likeRegistering ? <SignIn {...properties}/> : <LoginForm {...properties}/>}
         </>

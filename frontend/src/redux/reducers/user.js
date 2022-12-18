@@ -10,6 +10,7 @@ const userReducer = (state=null, action) => {
         nombre: (...)
         apellidos: (...)
         email: (...)
+        token: (...)
     }
     */
 
@@ -20,7 +21,7 @@ const userReducer = (state=null, action) => {
         case "EDIT_USR": {
             /*
             action = {
-                toEdit: "email" / "apellidos" / "nombre"
+                toEdit: "email" / "apellidos" / "nombre" / "token"
                 newValue: (...)
             }
             */
@@ -39,11 +40,11 @@ const userReducer = (state=null, action) => {
     }
 }
 
-export const actOfSetUser = (name, apellidos, email) => {
+export const actOfSetUser = (name, apellidos, email, token) => {
     return {
         type: "SET_USR",
         user: {
-            name, apellidos, email
+            name, apellidos, email, token
         }
     }
 }

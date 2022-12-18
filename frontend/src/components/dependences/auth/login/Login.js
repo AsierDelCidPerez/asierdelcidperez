@@ -13,10 +13,10 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
     event.preventDefault()
     const logData = {email: event.target.email.value, password: event.target.password.value}
     try {
-      const res = await logInResource.login(...logData)
+      const res = await logInResource.login(logData)
       localStorage.removeItem('userToken')
       localStorage.setItem('userToken', res.data.token)
-      dispatch(actOfSetUser())
+      dispatch(actOfSetUser(res.data.name, res.data.apellidos, res.data.email, res.data.token))
     }catch(err) {
       setNotification({
           notification: err.request.response,
@@ -41,7 +41,7 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
             <Link to="#">¿Has olvidado la contraseña?</Link>
             <Link to="#" onClick={toggleLikeRegistering} style={{cursor: 'pointer'}}>¿No tienes cuenta? Registrarse</Link>
           </div>
-          <Button fullwidth variant="contained">Acceder</Button>
+          <Button fullwidth variant="contained" type="submit">Acceder</Button>
       </Box>
     </>
   )

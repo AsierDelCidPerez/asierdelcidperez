@@ -12,8 +12,10 @@ import Documentation from './components/main/Documentation';
 import Blogs from './components/main/Blogs';
 import ABlog from './components/main/ABlog';
 import Login from './components/main/Login';
+import useAtInit from './components/dependences/others/alIniciar';
 
 function App() {
+  useAtInit()
   return (
     <div>
       <Navbar/>
