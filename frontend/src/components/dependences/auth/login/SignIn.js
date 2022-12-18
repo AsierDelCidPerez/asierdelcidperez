@@ -1,20 +1,34 @@
 import { TextField, Link, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
-import { useState } from "react"
+import useUserService from "../../../../services/users"
+import uris from "../../../../urls/uris"
 import { useNotification } from "../../others/Notification"
 import { validarContrasena, validarTexto, validarEmail} from "./validadores"
 
-const SignIn = ({toggleLikeRegistering}) => {
-    const [getNotification, setNotification] = useNotification()
-    const registrarse = event => {
+const SignIn = ({toggleLikeRegistering, notification}) => {
+    const [getNotification, setNotification] = notification
+    const userService = useUserService(`${uris.userControllerUri}/sign-in`)
+    const registrarse = async event => {
         event.preventDefault()
         const form = event.target
         if(validar(form)){
-
+            await completarRegistro()
         }
     }
 
-    const completarRegistro = ({nombre, apellidos, email, contrasena}) => {
-        console.log("Esto no hace nada POR AHORA...")
+    const completarRegistro = async ({nombre, apellidos, email, contrasena}) => {
+        try{
+            const res = await userService.register({name: nombre, apellidos, email, password: contrasena})
+            setNotification({
+                notification: 'Se ha registrado exitósamente',
+                isSuccess: true
+            })
+        }catch(err){
+            console.error(err)
+            setNotification({
+                notification: err.request.response,
+                isSuccess: false
+            })
+        }
     }
 
     const validar = form => {
@@ -51,7 +65,7 @@ const SignIn = ({toggleLikeRegistering}) => {
 
             if(!validarContrasena(form.contrasena.value)){
                 setNotification({
-                    notification: 'La contraseña debe ser más segura',
+                    notification: 'La contraseña no se ajusta a la política',
                     isSuccess: false
                 })
                 return

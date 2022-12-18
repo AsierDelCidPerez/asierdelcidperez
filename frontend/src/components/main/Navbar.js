@@ -16,8 +16,9 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import MyModal from '../dependences/others/MyModal';
-import { getLogin as getLoginForm } from '../dependences/auth/login/Login';
+import LoginForm from '../dependences/auth/login/Login';
 import SignIn from '../dependences/auth/login/SignIn';
+import { useNotification } from '../dependences/others/Notification';
 
 /*
 
@@ -75,6 +76,7 @@ const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [isLoggingIn, setLoggingIn] = React.useState(false)
+    const notification = useNotification()
     const [likeRegistering, setLikeRegistering] = React.useState(false);
     const loggedIn = false
     const handleOpenNavMenu = (event) => {
@@ -147,16 +149,25 @@ const Navbar = () => {
 
   const toggleLikeRegistering = () => setLikeRegistering(!likeRegistering)
 
+  const properties = {
+    notification,
+    toggleLikeRegistering
+  }
+
+  const getTheModal = () => (
+    <MyModal open={isLoggingIn} handleClose={toggleLogin} getBody={() => (
+      <>
+      {likeRegistering ? <SignIn {...properties}/> : <LoginForm {...properties}/>}
+      </>
+    )}/>
+  )
+
   const getLoginButton = () => (
     <Button color="inherit" onClick={toggleLogin}>Acceder</Button>
   )
     return (
       <>
-      <MyModal open={isLoggingIn} handleClose={toggleLogin} getBody={() => (
-        <>
-        {likeRegistering ? <SignIn toggleLikeRegistering={toggleLikeRegistering}/> : getLoginForm(toggleLikeRegistering)}
-        </>
-      )}/>
+      {getTheModal()}
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>

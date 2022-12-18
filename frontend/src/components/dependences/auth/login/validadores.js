@@ -5,11 +5,14 @@ export const validarTexto = texto => {
 }
 
 export const validarContrasena = contrasena => {
-    let posible = true
-    if(contrasena.length < 8) posible = false
-    if(!contrasena.match(/\W/) || !contrasena.match(/[A-Z]/) || !contrasena.match(/[a-z]/)) posible = false
-    return posible
+    if(!contrasena.match(/\W+/)) return false
+    if(!contrasena.match(/[A-Z]+/)) return false
+    if(!contrasena.match(/[a-z]+/)) return false
+    if(!contrasena.match(/[0-9]+/)) return false
+    if(30 > contrasena.length && contrasena.length > 8) return true
+    return false
 }
+
 
 export const validarEmail = email => {
     return email.match(/\w+@\w+.\w+/i)
