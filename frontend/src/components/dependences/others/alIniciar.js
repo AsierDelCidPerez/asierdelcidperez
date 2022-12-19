@@ -12,13 +12,15 @@ const useAtInit = () => {
 
     }else{
         // Si no
-        revisarCredencialesGuardadas().then(res => {
+        revisarCredencialesGuardadas()?.then(res => {
             if(res.data.valid){
                 const usuario = res.data.token.value
                 dispatch(actOfSetUser(usuario.name, usuario.apellidos, usuario.email, localStorage.getItem('userToken')))
+            }else{
+                localStorage.removeItem('userToken')
             }
-        })
-    }
+        }).catch(err => console.error(err))
+        }
 }
 
 module.exports = useAtInit

@@ -81,6 +81,7 @@ const Navbar = () => {
     const [likeRegistering, setLikeRegistering] = React.useState(false);
     const loggedIn = false
     const user = useSelector(state => state.user)
+    // console.log(user)
 
     const handleOpenNavMenu = (event) => {
       setAnchorElNav(event.currentTarget);
@@ -276,7 +277,8 @@ const Navbar = () => {
             /* Avatar de usuario y onClick Menu*/
             }
 
-            {user ? getAvatarInfo() : getLoginButton()}
+
+            {user !== null ? getAvatarInfo() : getLoginButton()}
             
           </Toolbar>
         </Container>

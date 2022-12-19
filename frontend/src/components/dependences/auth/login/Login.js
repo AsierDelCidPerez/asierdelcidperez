@@ -20,7 +20,7 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
     }catch(err) {
       setNotification({
           notification: err.request.response,
-          isSuccess: true
+          isSuccess: false
       })
     }
   }

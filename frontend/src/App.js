@@ -13,6 +13,7 @@ import Blogs from './components/main/Blogs';
 import ABlog from './components/main/ABlog';
 import Login from './components/main/Login';
 import useAtInit from './components/dependences/others/alIniciar';
+import CerrarMySesion from './components/dependences/user/CerrarMySesion';
 
 function App() {
   useAtInit()
@@ -22,6 +23,7 @@ function App() {
       <Container>
       <Notification/>
       <Routes>
+        <Route path="/actions/logout" element={<CerrarMySesion/>}/>
         <Route path="/auth/login" element={<Login/>}/>
         <Route path="/blogs/:id" element={<ABlog/>}/>
         <Route path="/blogs" element={<Blogs/>}/>

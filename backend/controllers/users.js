@@ -44,10 +44,10 @@ userRouter.post('/login', async(req, res) => {
             const token = jwt.sign({value: {name: usuario.name, apellidos: usuario.apellidos, email: usuario.email}, date: new Date(), ip}, settings.SECRET)
             res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email})
         }else{
-            res.status(404).send({error: 'Contraseña incorrecta'})
+            res.status(404).send('Contraseña incorrecta')
         }
     }else{
-        res.status(404).send({error: 'No existe el usuario'})
+        res.status(404).send('No existe el usuario')
     }
 })
 

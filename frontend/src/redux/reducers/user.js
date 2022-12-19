@@ -57,5 +57,11 @@ export const actOfEditUser = (toEdit, newValue) => {
     }
 }
 
+export const actOfLogOut = () => {
+    return {
+        type: "LOG_OUT"
+    }
+}
+
 
 export default userReducer
