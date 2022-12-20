@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { useToCloseSesion } from "./CerrarSesion"
+import { useToCloseSesion } from "./cerrarSesion"
 
 
 const CerrarMySesion = () => {

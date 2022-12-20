@@ -47,7 +47,7 @@ userRouter.post('/login', async(req, res) => {
             res.status(404).send('Contraseña incorrecta')
         }
     }else{
-        res.status(404).send('No existe el usuario')
+        res.status(404).send('No existe el email')
     }
 })
 

@@ -113,7 +113,7 @@ const Navbar = () => {
 
   const getAvatarInfo = () => (
     <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+              <Tooltip title="Abrir ajustes">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" >A</Avatar>
                 </IconButton>
@@ -179,6 +179,7 @@ const Navbar = () => {
             { 
             /* Logo */ 
             }
+            
               <img src="/logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => navigate('/')}/>
             {/*}
             <Typography
