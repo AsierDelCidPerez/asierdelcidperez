@@ -12,13 +12,11 @@
     ]
 */
 
-import { List, ListItem, ListItemIcon, ListItemButton, ListItemText, Drawer, Divider, Typography} from "@mui/material"
+import { List, ListItem, ListItemIcon, ListItemButton, ListItemText, Drawer, Divider, Card, Badge} from "@mui/material"
 import { Box } from "@mui/system"
 import { useState } from "react"
 
-const ListedNav = ({list, openSideBar=false, setOpenSideBar=() => {}}) => {
-
-    const [activeElem, setActiveElem] = useState(0)
+const ListedNav = ({list, openSideBar=false, setOpenSideBar=() => {}, activeElem=0, setActiveElem=() => {}}) => {
     const getOnClick = (onClick, i) => {
         return event => {
             setActiveElem(i)
@@ -28,6 +26,20 @@ const ListedNav = ({list, openSideBar=false, setOpenSideBar=() => {}}) => {
 
     const drawerWidth = 240
 
+    const getMyIcon = item => {
+        if(item.badge){
+            return (
+                <Badge badgeContent={item.badge} color="primary">
+                    <i className={item?.icon} />
+                </Badge>
+            )
+        }else{
+            return (
+                <i className={item?.icon} />
+            )
+        }
+    }
+
     const getListItems = () => (
         <>
         {
@@ -35,7 +47,7 @@ const ListedNav = ({list, openSideBar=false, setOpenSideBar=() => {}}) => {
                 <ListItem key={i} disablePadding>
                     <ListItemButton onClick={getOnClick(navElem.onClick, i)} selected={i===activeElem} id={i}>
                         <ListItemIcon>
-                            <i className={navElem?.icon} />
+                            {getMyIcon(navElem)}
                         </ListItemIcon>
                         <ListItemText primary={navElem?.name} />
                     </ListItemButton>
@@ -46,9 +58,11 @@ const ListedNav = ({list, openSideBar=false, setOpenSideBar=() => {}}) => {
     )
 
     const getList = () => (
-        <List>
-            {getListItems()}
-        </List>
+        <Card sx={{padding: 0}}>
+            <List>
+                {getListItems()}
+            </List>
+        </Card>
     )
 
     const getListPhone = () => (
@@ -93,7 +107,6 @@ const ListedNav = ({list, openSideBar=false, setOpenSideBar=() => {}}) => {
                 onClose={() => setOpenSideBar(!openSideBar)}
 >
                 {getListPhone()}
-                
         </Drawer>
         </Box>
         </div>

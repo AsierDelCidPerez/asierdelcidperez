@@ -180,7 +180,7 @@ const Navbar = () => {
             /* Logo */ 
             }
             
-              <img src="/logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => navigate('/')}/>
+              <img className="imgComputer" src="/logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => navigate('/')}/>
             {/*}
             <Typography
               variant="h6"
