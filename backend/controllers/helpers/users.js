@@ -5,6 +5,7 @@ const existeUsuario = async email => {
     return userRes
 }
 
+
 module.exports = {
     existeUsuario
 }

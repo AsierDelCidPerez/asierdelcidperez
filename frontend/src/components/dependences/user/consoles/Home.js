@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux"
 import CardIcon from "../../others/CardIcon"
 
 
@@ -8,11 +9,13 @@ const Home = () => {
         color: "secondary"
     }
 
+    const user = useSelector(state => state.user)
+
     return (
         <div>
             <CardIcon icon={icon} getBody={() => (
                 <div>
-                    <p>Hola mundo!!!</p>
+                    <h1>Bienvenido {user?.nombre}</h1>
                 </div>
             )}>
 
