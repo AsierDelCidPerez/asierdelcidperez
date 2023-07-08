@@ -60,7 +60,7 @@ const settings = [
   {
     id: 2,
     name: 'Dashboard',
-    uri: '/settings/dashboard',
+    uri: '/user',
     icon: "fa-solid fa-table-columns"
   },
   {

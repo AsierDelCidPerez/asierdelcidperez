@@ -4,6 +4,8 @@ import CardIcon from "../../others/CardIcon"
 
 const Home = () => {
 
+    
+
     const icon = {
         name: "fa-solid fa-right-to-bracket",
         color: "secondary"

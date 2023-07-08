@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 const settings = require('../utils/settings')
 const {existeUsuario} = require('./helpers/users')
 const { sumarDias } = require('../utils/fechas')
+const { validacionToken } = require('../modules/token')
 
 const validarContrasena = password => {
     if(!password.match(/\W/)) return false
@@ -25,18 +26,6 @@ const existsUser = async email => {
     }
 }
 
-const verifyTokenOfUser = token => {
-    try{
-        const user = jwt.verify(token, settings.SECRET)
-        // console.log(user)
-        if(user === undefined) return false
-        const fecha = new Date(parseInt(user.date))
-        // console.log(fecha)
-        if(sumarDias(fecha, 360) < (new Date())) return false
-        return user
-    }catch(e) {return false}
-}
-
 const validacionDatos = ({name, apellidos, email, password}) => {
     if(name.length <= 0 && apellidos.length <= 0) return false
     // console.log("Oki")
@@ -46,11 +35,6 @@ const validacionDatos = ({name, apellidos, email, password}) => {
     return false
 }
 
-userRouter.get('/verify', async(req, res) => {
-    const token = req.get('Authorization')
-    verifyTokenOfUser(token) !== false ? res.status(200).send({verified: true, time: new Date()}) : res.status(400).send({verified: false, time: new Date()})
-})
-
 userRouter.get('/exists', async(req, res) => {
     const email = req.body.email
     usuario = await existsUser(email)
@@ -58,13 +42,14 @@ userRouter.get('/exists', async(req, res) => {
 })
 
 userRouter.put('/changePassword', async(req, res) => {
-    const token = req.get('Authorization')
+    const token = jwt.verify(req.get('Authorization'), settings.SECRET)
+    const value = token.value
     const {oldPassword, newPassword} = req.body
-    const {value} = verifyTokenOfUser(token)
-    if(value.email === undefined) {
-        res.status(401).send({error: "token no introducido o inválido", date: new Date()})
+    if(!validacionToken(token, request)) {
+        res.status(401).send({error: "Token inválido o incorrecto", date: new Date()})
         return
     }
+
     const myUser = await user.findOne({email: value.email})
     if(await bcrypt.compare(oldPassword, myUser.passwordHash)){
         if(validarContrasena(newPassword)){
@@ -82,9 +67,9 @@ userRouter.put('/changePassword', async(req, res) => {
 
 userRouter.put('/edit/:ajuste', async(req, res) => {
     const ajuste = req.params.ajuste
-    const token = verifyTokenOfUser(req.get('Authorization'))
-    if(token === false) {
-        res.status(401).send({error: {error: 323, description: "Token no introducido o inválido"}, date: new Date()})
+    const token = jwt.verify(token, settings.SECRET)
+    if(!validacionToken(token)){
+        res.status(401).send({error: "Token inválido o incorrecto", date: new Date()})
         return
     }
     const {newValue} = req.body
@@ -136,7 +121,7 @@ userRouter.post('/login', async(req, res) => {
     if(usuario){
         if(await bcrypt.compare(password, usuario.passwordHash)){
             const ip = await bcrypt.hash(req.ip, 10)
-            const token = jwt.sign({value: {name: usuario.name, apellidos: usuario.apellidos, email: usuario.email}, date: new Date().getTime().toString(), ip}, settings.SECRET)
+            const token = jwt.sign({value: {name: usuario.name, apellidos: usuario.apellidos, email: usuario.email}, date: new Date(), ip}, settings.SECRET)
             res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email})
         }else{
             res.status(404).send('Contraseña incorrecta')

@@ -15,8 +15,18 @@ const useUserService = uri => {
         return axios.post(uri, data)
     }
 
+    const cambiarContrasena = ({actual, nPass}) => {
+        const data = {oldPassword: actual, newPassword: nPass}
+        const config = {
+            headers: {
+                Authorization: token
+            }
+        }
+        return axios.put(uri, data, config)
+    }
+
     return {
-        register, login
+        register, login, cambiarContrasena
     }
 }
 

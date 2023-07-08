@@ -1,10 +1,12 @@
 import { Grid, Box, Typography, Button, Card } from "@mui/material"
 import ListedNav from "../dependences/others/ListedNav"
-import React from "react"
-import { Link } from "react-router-dom"
+import React, { useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import Grafica from "../dependences/Grafica"
 import LanguageGrafica from "../dependences/home/LanguageGrafica"
 import Home from "../dependences/user/consoles/Home"
+import ChangePassword from "../dependences/user/consoles/ChangePassword"
+import { useSelector } from "react-redux"
 
 const opcionesUsuario = [
     {
@@ -24,9 +26,9 @@ const opcionesUsuario = [
     {
         name: "Cambiar contraseña",
         icon: "fa-solid fa-key",
-        onClick: () => {
-            
-        } 
+        onClick: () => (
+            <ChangePassword/>
+        )
     },
     {
         name: "Mis notificaciones",
@@ -48,40 +50,99 @@ const opcionesUsuario = [
 const PortalUser = () => {
     const [openSideBar, setOpenSideBar] = React.useState(false)
     const [activeElem, setActiveElem] = React.useState(0)
+    const user = useSelector(state => state.user)
+    const navigate = useNavigate()
+   
+    /*
+    // QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
+    useEffect(() => {
+        if(user === null) navigate('/')
+    }, [])
+    */
+
+
+    /*
+    //QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
+    const getPortal = () => user !== null ? 
+    (
+    <div>
+        <Box sx={{display: {md: 'block', sm: 'none', xs: 'none'}}}>
+            <Grid container gap={2}>
+                <Grid item xs={3}>
+                    <ListedNav list={opcionesUsuario} activeElem={activeElem} setActiveElem={setActiveElem}/>
+                </Grid>
+                <Grid item xs={8}>
+                    <Card>
+                        <Typography
+                        sx={{fontSize: 25, textAlign: 'center', fontWeight: 'bold'}}>
+                            <i className={opcionesUsuario[activeElem].icon}/> &nbsp;
+                            {opcionesUsuario[activeElem].name}
+                        </Typography>
+                    </Card>
+                    <br/>
+                    {opcionesUsuario[activeElem].onClick()}
+                </Grid>
+            </Grid>
+        </Box>
+        <Box sx={{display: {md: 'none', sm: 'block'}}}>
+            <ListedNav list={opcionesUsuario} openSideBar={openSideBar} setOpenSideBar={setOpenSideBar}/>
+            <div style={{textAlign: 'center'}}>
+                <Button variant="contained" onClick={() => setOpenSideBar(!openSideBar)}>
+                    Abrir opciones
+                </Button>
+            </div>
+            <br/>
+            <Typography sx={{textAlign: 'center', fontSize: 20}}>
+                <i className={opcionesUsuario[activeElem].icon}/>&nbsp;
+                {opcionesUsuario[activeElem].name}
+            </Typography>
+        </Box>
+        <br/>
+    </div>)
+    :
+    (<div></div>)
+    */
+    // AÑADIR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
+    const getPortal = () => (
+        <div>
+        <Box sx={{display: {md: 'block', sm: 'none', xs: 'none'}}}>
+            <Grid container gap={2}>
+                <Grid item xs={3}>
+                    <ListedNav list={opcionesUsuario} activeElem={activeElem} setActiveElem={setActiveElem}/>
+                </Grid>
+                <Grid item xs={8}>
+                    <Card>
+                        <Typography
+                        sx={{fontSize: 25, textAlign: 'center', fontWeight: 'bold'}}>
+                            <i className={opcionesUsuario[activeElem].icon}/> &nbsp;
+                            {opcionesUsuario[activeElem].name}
+                        </Typography>
+                    </Card>
+                    <br/>
+                    {opcionesUsuario[activeElem].onClick()}
+                </Grid>
+            </Grid>
+        </Box>
+        <Box sx={{display: {md: 'none', sm: 'block'}}}>
+            <ListedNav list={opcionesUsuario} openSideBar={openSideBar} setOpenSideBar={setOpenSideBar}/>
+            <div style={{textAlign: 'center'}}>
+                <Button variant="contained" onClick={() => setOpenSideBar(!openSideBar)}>
+                    Abrir opciones
+                </Button>
+            </div>
+            <br/>
+            <Typography sx={{textAlign: 'center', fontSize: 20}}>
+                <i className={opcionesUsuario[activeElem].icon}/>&nbsp;
+                {opcionesUsuario[activeElem].name}
+            </Typography>
+        </Box>
+        <br/>
+    </div>
+    )
+
     return (
         <div>
-            <Box sx={{display: {md: 'block', sm: 'none', xs: 'none'}}}>
-                <Grid container gap={2}>
-                    <Grid item xs={3}>
-                        <ListedNav list={opcionesUsuario} activeElem={activeElem} setActiveElem={setActiveElem}/>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Card>
-                            <Typography
-                            sx={{fontSize: 25, textAlign: 'center', fontWeight: 'bold'}}>
-                                <i className={opcionesUsuario[activeElem].icon}/> &nbsp;
-                                {opcionesUsuario[activeElem].name}
-                            </Typography>
-                        </Card>
-                        <br/>
-                        {opcionesUsuario[activeElem].onClick()}
-                    </Grid>
-                </Grid>
-            </Box>
-            <Box sx={{display: {md: 'none', sm: 'block'}}}>
-                <ListedNav list={opcionesUsuario} openSideBar={openSideBar} setOpenSideBar={setOpenSideBar}/>
-                <div style={{textAlign: 'center'}}>
-                    <Button variant="contained" onClick={() => setOpenSideBar(!openSideBar)}>
-                        Abrir opciones
-                    </Button>
-                </div>
-                <br/>
-                <Typography sx={{textAlign: 'center', fontSize: 20}}>
-                    <i className={opcionesUsuario[activeElem].icon}/>&nbsp;
-                    {opcionesUsuario[activeElem].name}
-                </Typography>
-            </Box>
-            <br/>
+        {getPortal()}
         </div>
     )
 }
