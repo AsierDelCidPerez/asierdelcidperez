@@ -10,14 +10,16 @@ import uris from "../../../../urls/uris"
 
 const ChangePassword = () => {
 
-    const user = useSelector(state => state.user)
+    // const user = useSelector(state => state.user)
     const {setAlert, getAlert} = useAlert()
     const userService = useUserService(`${uris.userControllerUri}/changePassword`)
 
     const enviarCambiarPassword = async (actual, nPass) => {
-        const resultados = await userService.cambiarContrasena({actual, nPass})
-        if(resultados.status === 200){
+        try{
+            await userService.cambiarContrasena({actual, nPass})
             setNotification({notification: "Se ha modificado exitósamente la contraseña", isSuccess: true})
+        }catch(e){
+            setNotification({notification: e.response.data.error, isSuccess: false})
         }
     }
 
@@ -28,7 +30,7 @@ const ChangePassword = () => {
         const vNPass = event.target.vn_contrasena.value
         if(nPass === vNPass){
             if(validarContrasena(nPass)){
-                const changePassowrdInfo = {actual, nPass} 
+                // const changePassowrdInfo = {actual, nPass} 
                 setAlert({
                     open: true,
                     isConfirmAlert: true,

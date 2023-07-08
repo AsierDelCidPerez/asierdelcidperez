@@ -7,33 +7,7 @@ const settings = require('../utils/settings')
 const {existeUsuario} = require('./helpers/users')
 const { sumarDias } = require('../utils/fechas')
 const { validacionToken } = require('../modules/token')
-
-const validarContrasena = password => {
-    if(!password.match(/\W/)) return false
-    if(!password.match(/[A-Z]/)) return false
-    if(!password.match(/[a-z]/)) return false
-    if(!password.match(/[0-9]/)) return false
-    if(30 > password.length && password.length > 8) return true
-    return false
-}
-
-const existsUser = async email => {
-    const usuario = await existeUsuario(email)
-    if(usuario){
-        return usuario
-    }else{
-        return false
-    }
-}
-
-const validacionDatos = ({name, apellidos, email, password}) => {
-    if(name.length <= 0 && apellidos.length <= 0) return false
-    // console.log("Oki")
-    if(!email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) return false
-    // console.log("oki 2")
-    if(validarContrasena(password)) return true
-    return false
-}
+const { validacionDatos } = require('./helpers/validators')
 
 userRouter.get('/exists', async(req, res) => {
     const email = req.body.email
@@ -45,14 +19,18 @@ userRouter.put('/changePassword', async(req, res) => {
     const token = jwt.verify(req.get('Authorization'), settings.SECRET)
     const value = token.value
     const {oldPassword, newPassword} = req.body
-    if(!validacionToken(token, request)) {
+    if(!validacionToken(token, req)) {
         res.status(401).send({error: "Token inválido o incorrecto", date: new Date()})
         return
     }
 
     const myUser = await user.findOne({email: value.email})
     if(await bcrypt.compare(oldPassword, myUser.passwordHash)){
-        if(validarContrasena(newPassword)){
+        if(oldPassword === newPassword){
+            res.status(400).send({error: "No puedes usar la misma contraseña que tenías", date: new Date()})
+            return
+        }
+        if(validacionDatos({password: newPassword})){
             const nPasswordEnc = await bcrypt.hash(newPassword, 10)
             myUser.passwordHash = nPasswordEnc
             await myUser.save()
@@ -67,7 +45,7 @@ userRouter.put('/changePassword', async(req, res) => {
 
 userRouter.put('/edit/:ajuste', async(req, res) => {
     const ajuste = req.params.ajuste
-    const token = jwt.verify(token, settings.SECRET)
+    const token = jwt.verify(req.get('Authorization'), settings.SECRET)
     if(!validacionToken(token)){
         res.status(401).send({error: "Token inválido o incorrecto", date: new Date()})
         return
@@ -89,11 +67,11 @@ userRouter.put('/edit/:ajuste', async(req, res) => {
         return
     }
     console.log(token)
-    const myUser = await existsUser(myEmail)
+    const myUser = await existeUsuario(myEmail)
     if(myUser === false) {
         res.status(400).send({error: {
             code: 125,
-            description: "token mal configurado"
+            description: "Token mal configurado"
         }, date: new Date()})
         return
     }
