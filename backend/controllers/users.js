@@ -58,8 +58,76 @@ userRouter.get('/exists', async(req, res) => {
 })
 
 userRouter.put('/changePassword', async(req, res) => {
-    const {token, oldPassword, newPassword} = req.body
-    const user = jwt.verify(token)
+    const token = req.get('Authorization')
+    const {oldPassword, newPassword} = req.body
+    const {value} = verifyTokenOfUser(token)
+    if(value.email === undefined) {
+        res.status(401).send({error: "token no introducido o inválido", date: new Date()})
+        return
+    }
+    const myUser = await user.findOne({email: value.email})
+    if(await bcrypt.compare(oldPassword, myUser.passwordHash)){
+        if(validarContrasena(newPassword)){
+            const nPasswordEnc = await bcrypt.hash(newPassword, 10)
+            myUser.passwordHash = nPasswordEnc
+            await myUser.save()
+            res.status(200).send({changedPassword: true, email: myUser.email, date: new Date()})
+        }else{
+            res.status(400).send({changedPassword: false, error: "Nueva contraseña no válida", date: new Date()})
+        }
+    }else{
+        res.status(400).send({changedPassword: false, error: "La contraseña es incorrecta", date: new Date()})
+    }
+})
+
+userRouter.put('/edit/:ajuste', async(req, res) => {
+    const ajuste = req.params.ajuste
+    const token = verifyTokenOfUser(req.get('Authorization'))
+    if(token === false) {
+        res.status(401).send({error: {error: 323, description: "Token no introducido o inválido"}, date: new Date()})
+        return
+    }
+    const {newValue} = req.body
+    if(ajuste === "passwordHash") {res.status(405).send({error: {
+        code: 324,
+        description: "Método no disponible en esta dirección de API",
+    }, date: new Date()})
+    return
+}
+    const availabeAjustes = ["name", "apellidos", "email"]
+    const myEmail = token.value.email
+    if(!availabeAjustes.includes(ajuste)){
+        res.status(405).send({error: {
+            code: 324,
+            description: "Método no disponible en esta dirección de API"
+        }, date: new Date()})
+        return
+    }
+    console.log(token)
+    const myUser = await existsUser(myEmail)
+    if(myUser === false) {
+        res.status(400).send({error: {
+            code: 125,
+            description: "token mal configurado"
+        }, date: new Date()})
+        return
+    }
+    const nToken = {
+        ...token,
+        value: {
+            ...token.value,
+            [ajuste]: newValue
+        }
+    }
+    const newToken = jwt.sign(nToken, settings.SECRET)
+    myUser[ajuste] = newValue
+    await myUser.save()
+    res.status(202).send({success: true, 
+        newToken,
+        change: {[ajuste]: {
+        oldValue: myEmail,
+        newValue
+    }}, date: new Date()})
 })
 
 userRouter.post('/login', async(req, res) => {
