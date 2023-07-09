@@ -1,7 +1,7 @@
 const app = require('./app')
-const config = require('./utils/settings')
+require('dotenv').config()
 
-app.listen(config.port, () => {
-    console.log(`URL Backend: http://localhost:${config.port}`)
+app.listen(process.env.PORT, () => {
+    console.log(`URL Backend: http://localhost:${process.env.PORT}`)
 })
 

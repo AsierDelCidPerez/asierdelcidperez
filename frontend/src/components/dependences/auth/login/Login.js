@@ -19,7 +19,7 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
       dispatch(actOfSetUser(res.data.name, res.data.apellidos, res.data.email, res.data.token))
     }catch(err) {
       setNotification({
-          notification: err.request.response,
+          notification: err.response.data.error,
           isSuccess: false
       })
     }

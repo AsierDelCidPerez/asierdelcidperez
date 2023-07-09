@@ -53,15 +53,12 @@ const PortalUser = () => {
     const user = useSelector(state => state.user)
     const navigate = useNavigate()
    
-    /*
     // QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
     useEffect(() => {
         if(user === null) navigate('/')
     }, [])
-    */
 
 
-    /*
     //QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
     const getPortal = () => user !== null ? 
     (
@@ -101,7 +98,8 @@ const PortalUser = () => {
     </div>)
     :
     (<div></div>)
-    */
+
+    /*
     // AÑADIR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
     const getPortal = () => (
         <div>
@@ -139,6 +137,7 @@ const PortalUser = () => {
         <br/>
     </div>
     )
+    */
 
     return (
         <div>

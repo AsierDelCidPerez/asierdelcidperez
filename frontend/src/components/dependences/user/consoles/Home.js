@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux"
-import CardIcon from "../../others/CardIcon"
+import { Card, CardContent } from "@mui/material"
 
 
 const Home = () => {
@@ -15,13 +15,13 @@ const Home = () => {
 
     return (
         <div>
-            <CardIcon icon={icon} getBody={() => (
-                <div>
-                    <h1>Bienvenido {user?.nombre}</h1>
-                </div>
-            )}>
-
-            </CardIcon>
+            <Card>
+                <CardContent>
+                    <div>
+                        <h1>Bienvenid@ {user?.name} {user?.apellidos}</h1>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }

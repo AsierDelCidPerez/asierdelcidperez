@@ -1,18 +1,20 @@
 
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import CardIcon from "../../others/CardIcon"
-import { Card, TextField, Box, Button } from "@mui/material"
+import { Card, TextField, Box, Button, CardContent } from "@mui/material"
 import { useNotification } from "../../others/Notification"
 import useAlert from "../../others/MyAlert"
 import { validarContrasena } from "../../auth/login/validadores"
 import useUserService from "../../../../services/users"
 import uris from "../../../../urls/uris"
+import { actOfLogOut } from "../../../../redux/reducers/user"
 
 const ChangePassword = () => {
 
     // const user = useSelector(state => state.user)
     const {setAlert, getAlert} = useAlert()
     const userService = useUserService(`${uris.userControllerUri}/changePassword`)
+    const dispatch = useDispatch()
 
     const enviarCambiarPassword = async (actual, nPass) => {
         try{
@@ -20,6 +22,11 @@ const ChangePassword = () => {
             setNotification({notification: "Se ha modificado exitósamente la contraseña", isSuccess: true})
         }catch(e){
             setNotification({notification: e.response.data.error, isSuccess: false})
+            if(e.response.data.reset === true){
+                console.log("He entrado")
+                localStorage.removeItem('userToken')
+                dispatch(actOfLogOut())
+            }
         }
     }
 
@@ -51,18 +58,20 @@ const ChangePassword = () => {
     const [getNotification, setNotification] = useNotification()
 
     return (
-        <Card sx={{padding: "5%"}}>
-            {getAlert()}
-            {getNotification()}
-            <br/>
-            <Box component="form" onSubmit={cambiarContrasena}>
-                <TextField fullWidth variant="outlined" type="password" name="actual_password" label="Contraseña actual"/><br/><br/>
-                <TextField fullWidth variant="outlined" type="password" name="n_contrasena" label="Nueva contraseña"/><br/><br/>
-                <TextField fullWidth variant="outlined" type="password" name="vn_contrasena" label="Verificar nueva contraseña"/><br/><br/>
-                <div style={{textAlign: 'center'}}>
-                <Button variant="contained" type="submit">Cambiar contraseña</Button>
-                </div>
-            </Box>
+        <Card>
+            <CardContent>
+                {getAlert()}
+                {getNotification()}
+                <br/>
+                <Box component="form" onSubmit={cambiarContrasena}>
+                    <TextField fullWidth variant="outlined" type="password" name="actual_password" label="Contraseña actual"/><br/><br/>
+                    <TextField fullWidth variant="outlined" type="password" name="n_contrasena" label="Nueva contraseña"/><br/><br/>
+                    <TextField fullWidth variant="outlined" type="password" name="vn_contrasena" label="Verificar nueva contraseña"/><br/><br/>
+                    <div style={{textAlign: 'center'}}>
+                    <Button variant="contained" type="submit">Cambiar contraseña</Button>
+                    </div>
+                </Box>
+            </CardContent>
         </Card>
     )
     

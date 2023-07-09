@@ -11,13 +11,32 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     email: {
-        unique: true,
-        type: String,
+        type: String, // El email será único por tenant
         required: true,
+        unique: true
     },
     passwordHash: {
         type: String,
         required: true,
+    },
+    tenant: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tenant',
+        required: true
+    },
+    rank: {
+        type: String,
+        ref: 'Rank',
+        required: true,
+    },
+    blocked: {
+        value: {
+            type: Number,
+            required: true
+        },
+        reason: {
+            type: String
+        }
     }
 
 })
@@ -25,6 +44,7 @@ userSchema.plugin(uniqueValidator)
 
 userSchema.set('toJSON', {
     transform: (_, reqObj) => {
+        reqObj.id = reqObj._id
         delete reqObj._id
         delete reqObj.__v
         delete reqObj.passwordHash

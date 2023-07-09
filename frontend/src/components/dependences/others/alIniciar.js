@@ -20,6 +20,7 @@ const useAtInit = () => {
                 localStorage.removeItem('userToken')
             }
         }).catch(err => console.error(err))
+            localStorage.removeItem('userToken')
         }
 }
 

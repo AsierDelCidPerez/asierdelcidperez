@@ -25,7 +25,7 @@ const SignIn = ({toggleLikeRegistering, notification}) => {
         }catch(err){
             console.error(err)
             setNotification({
-                notification: err.request.response,
+                notification: err.response.data.error,
                 isSuccess: false
             })
         }

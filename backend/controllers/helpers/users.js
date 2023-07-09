@@ -6,7 +6,14 @@ const existeUsuario = async email => {
     return userRes
 }
 
+const isBlocked = user => {
+    if(user.blocked.value !== -1){
+        return true
+    }
+    return false
+}
+
 
 module.exports = {
-    existeUsuario
+    existeUsuario, isBlocked
 }
