@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux"
-import { Card, CardContent } from "@mui/material"
+import { Card, CardContent, Typography } from "@mui/material"
 
 
 const Home = () => {
@@ -17,8 +17,10 @@ const Home = () => {
         <div>
             <Card>
                 <CardContent>
-                    <div>
-                        <h1>Bienvenid@ {user?.name} {user?.apellidos}</h1>
+                    <div style={{textAlign: 'center'}}>
+                        <Typography sx={{display: {xs: 'none', sm: 'none', md: 'block'}}} variant="h3">Bienvenid@ {user?.name} {user?.apellidos}</Typography>
+
+                        <Typography sx={{display: {xs: 'block', sm: 'block', md: 'none'}}} variant="h5">Bienvenid@ {user?.name} {user?.apellidos}</Typography>
                     </div>
                 </CardContent>
             </Card>

@@ -19,11 +19,26 @@ const tenSchema = new mongoose.Schema({
             ref: 'Subscription'
         }
     ],
+    aditionals: {
+        mfa: {
+            type: Boolean
+        }
+    },
+    owner : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     features: [
         {
             type: String
         }
     ],
+    subTenants: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Tenant'
+        }
+    ]
 })
 
 tenSchema.plugin(uniqueValidator)

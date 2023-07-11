@@ -10,7 +10,7 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
         dragOver: false,
         incorrect: false
     })
-    const image = useImageService(uris.imageControllerUri)
+    const image = useImageService()
     const [files, setFiles] = useState([])
     const [links, setLinks] = useState([])
 

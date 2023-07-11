@@ -54,12 +54,14 @@ const PortalUser = () => {
     const navigate = useNavigate()
    
     // QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
+    /*
     useEffect(() => {
         if(user === null) navigate('/')
     }, [])
-
+    */
 
     //QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
+    /*
     const getPortal = () => user !== null ? 
     (
     <div>
@@ -98,8 +100,12 @@ const PortalUser = () => {
     </div>)
     :
     (<div></div>)
+    */
+    
 
-    /*
+    {
+        /*Interfaz para el portal de usuario en ordenador */
+    }
     // AÑADIR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
     const getPortal = () => (
         <div>
@@ -121,8 +127,14 @@ const PortalUser = () => {
                 </Grid>
             </Grid>
         </Box>
+
+
+
+        {
+            /*Interfaz para el portal de usuario en móvil */
+        }
         <Box sx={{display: {md: 'none', sm: 'block'}}}>
-            <ListedNav list={opcionesUsuario} openSideBar={openSideBar} setOpenSideBar={setOpenSideBar}/>
+            <ListedNav list={opcionesUsuario} openSideBar={openSideBar} onClose={e => {console.log(e.target)}} activeElem={activeElem} setActiveElem={setActiveElem} setOpenSideBar={setOpenSideBar}/>
             <div style={{textAlign: 'center'}}>
                 <Button variant="contained" onClick={() => setOpenSideBar(!openSideBar)}>
                     Abrir opciones
@@ -133,11 +145,13 @@ const PortalUser = () => {
                 <i className={opcionesUsuario[activeElem].icon}/>&nbsp;
                 {opcionesUsuario[activeElem].name}
             </Typography>
+            <br/>
+            {opcionesUsuario[activeElem].onClick()}
         </Box>
         <br/>
     </div>
     )
-    */
+    
 
     return (
         <div>

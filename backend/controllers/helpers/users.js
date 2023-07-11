@@ -1,7 +1,7 @@
 const user = require('../../model/User')
 
-const existeUsuario = async email => {
-    const userRes = await user.findOne({email})
+const existeUsuario = async (email, tenantId) => {
+    const userRes = await user.findOne({email, tenant: tenantId})
     if(userRes === null) return false
     return userRes
 }

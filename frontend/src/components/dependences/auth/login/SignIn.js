@@ -2,11 +2,22 @@ import { TextField, Link, Button, Box, Checkbox, FormControlLabel } from "@mui/m
 import useUserService from "../../../../services/users"
 import uris from "../../../../urls/uris"
 import { useNotification } from "../../others/Notification"
-import { validarContrasena, validarTexto, validarEmail} from "./validadores"
+import { validarContrasena, validarTexto, validarEmail} from "./dependences/validadores"
+import useAlert from "../../others/MyAlert"
+import { useState } from "react"
+import VerifyPage from "./dependences/VerifyEmail"
 
 const SignIn = ({toggleLikeRegistering, notification}) => {
     const [getNotification, setNotification] = notification
-    const userService = useUserService(`${uris.userControllerUri}/sign-in`)
+    const userService = useUserService()
+    // const {setAlert, getAlert} = useAlert()
+    const [verifying, setVerifying] = useState({
+        value: false,
+        correo: "",
+        token: ""
+    })
+
+
     const registrarse = async event => {
         event.preventDefault()
         const form = event.target
@@ -16,12 +27,49 @@ const SignIn = ({toggleLikeRegistering, notification}) => {
     }
 
     const completarRegistro = async ({nombre, apellidos, email, contrasena}) => {
+        // console.log(email)
         try{
             const res = await userService.register({name: nombre, apellidos, email, password: contrasena})
-            setNotification({
-                notification: 'Se ha registrado exitósamente',
-                isSuccess: true
-            })
+            if(res.data.verify){
+                setVerifying({
+                    value: true,
+                    token: res.data.tokenValidacion,
+                    correo: email
+                })
+                
+                /*
+                setAlert({
+                    open: true,
+                    isConfirmAlert: false,
+                    onConfirm: () => {},
+                    title: "Verificación de correo",
+                    text: `Acaba de recibir un correo en la dirección ${email}. Especifique el código que haya recibido`,
+                    type: "nothing",
+                    needsPrompt: {
+                        value: true,
+                        data: {
+                            placeholder: "Código de verificación",
+                            onSubmit: async prompt => {
+                                const token = res.data.tokenValidacion
+                                console.log("Verificacion | " + token + " | " + prompt)
+                                const res2 =  await userService.verificarCorreo({token, prompt})
+                                if(res2.data.verified === true && res2.status === 200){
+                                    setNotification({
+                                        notification: 'Se ha registrado exitósamente',
+                                        isSuccess: true
+                                    })
+                                }
+                            }
+                        }
+                    }
+                })
+                */
+            }else{
+                setNotification({
+                    notification: 'Se ha registrado exitósamente',
+                    isSuccess: true
+                })
+            }
         }catch(err){
             console.error(err)
             setNotification({
@@ -87,27 +135,70 @@ const SignIn = ({toggleLikeRegistering, notification}) => {
         }
     }
 
+    const validarCorreo = async vCodigo => {
+        try{
+            const res = await userService.verificarCorreo(verifying.token, vCodigo)
+            if(res.status === 200 && res.data.verified === true){
+                setNotification({
+                    notification: 'Se ha registrado exitósamente',
+                    isSuccess: true
+                })
+                setVerifying({
+                    value: false,
+                    correo: "",
+                    token: ""
+                })
+            }
+        }catch(e){
+            if(e.response.data.verify === true){
+                setVerifying({
+                    value: true,
+                    correo: verifying.correo,
+                    token: e.response.data.tokenValidacion
+                })
+            }
+            setNotification({
+                notification: e.response.data.error,
+                isSuccess: false
+            })
+        }
+    }
+
+    const getSignIn = () => {
+        if(verifying.value){
+            // console.log(verifying.email)
+            return (
+                <VerifyPage email={verifying.correo} getNotification={getNotification} onFinish={validarCorreo}/>
+            )
+        }else{
+            return (
+                <>
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                    <img src="/logoColor.png" width="18%"/>
+                </div>
+                    <Box component="form" onSubmit={registrarse} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
+                        {getNotification()}
+                        <h1>Registrarse</h1>
+                            <TextField fullwidth variant="outlined" name="nombre" autoComplete='off' label="Nombre"/><br/>
+                            <TextField fullwidth variant="outlined" name="apellidos" autoComplete='off' label="Apellidos"/><br/>
+                            <TextField fullwidth variant="outlined" type="email" name="email" autoComplete='off' label="Email"/><br/>
+                            <TextField fullwidth type="password" name="contrasena" variant="outlined" label="Contraseña"/><br/>
+                            <TextField fullwidth type="password" name="vContrasena" variant="outlined" label="Confirmar contraseña"/><br/>
+                            <FormControlLabel name="aceptarTerminos" control={<Checkbox />} label="Acepto los términos legales y de privacidad" />
+                                <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
+                                <Link to="#" style={{cursor: 'pointer'}} onClick={toggleLikeRegistering}>¿Has cambiado de idea? Acceder</Link>
+                            </div>
+                            <Button fullwidth variant="contained" type="submit">Registrarse</Button>
+                    </Box>
+                </>
+            )   
+        }
+    }
+
 
     return (
         <>
-        <div style={{display: 'flex', justifyContent: 'center'}}>
-            <img src="/logoColor.png" width="18%"/>
-        </div>
-            <Box component="form" onSubmit={registrarse} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
-                {getNotification()}
-                <h1>Registrarse</h1>
-                    <TextField fullwidth variant="outlined" name="nombre" autoComplete='off' label="Nombre"/><br/>
-                    <TextField fullwidth variant="outlined" name="apellidos" autoComplete='off' label="Apellidos"/><br/>
-                    <TextField fullwidth variant="outlined" type="email" name="email" autoComplete='off' label="Email"/><br/>
-                    <TextField fullwidth type="password" name="contrasena" variant="outlined" label="Contraseña"/><br/>
-                    <TextField fullwidth type="password" name="vContrasena" variant="outlined" label="Confirmar contraseña"/><br/>
-                    <FormControlLabel name="aceptarTerminos" control={<Checkbox />} label="Acepto los términos legales y de privacidad" />
-                        <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
-                        <Link to="#">¿Has olvidado la contraseña?</Link>
-                        <Link to="#" style={{cursor: 'pointer'}} onClick={toggleLikeRegistering}>¿Has cambiado de idea? Acceder</Link>
-                    </div>
-                    <Button fullwidth variant="contained" type="submit">Registrarse</Button>
-            </Box>
+        {getSignIn()}
         </>
     )
 }

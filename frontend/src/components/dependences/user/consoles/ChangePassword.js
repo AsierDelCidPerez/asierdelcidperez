@@ -4,10 +4,10 @@ import CardIcon from "../../others/CardIcon"
 import { Card, TextField, Box, Button, CardContent } from "@mui/material"
 import { useNotification } from "../../others/Notification"
 import useAlert from "../../others/MyAlert"
-import { validarContrasena } from "../../auth/login/validadores"
 import useUserService from "../../../../services/users"
 import uris from "../../../../urls/uris"
 import { actOfLogOut } from "../../../../redux/reducers/user"
+import { validarContrasena } from "../../auth/login/dependences/validadores"
 
 const ChangePassword = () => {
 
@@ -44,7 +44,14 @@ const ChangePassword = () => {
                     onConfirm: () => enviarCambiarPassword(actual, nPass),
                     title: "¿Cambiar contraseña?",
                     text: "Si cambias la contraseña no podrás volver a iniciar sesión con tu cuenta actual, es decir, deberás hacerlo con la nueva contraseña que has elegido ahora.",
-                    type: "danger"
+                    type: "danger",
+                    needsPrompt: {
+                        value: false,
+                        data: {
+                            placeholder: "",
+                            onSubmit: () => {}
+                        }
+                    }
                 })
 
             }else{

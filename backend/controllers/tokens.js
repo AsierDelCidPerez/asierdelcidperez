@@ -11,6 +11,11 @@ const subValidUser = sub => {
     return true
 }
 
+const subValidFlux = sub => {
+    if(!sub.tenant.features.includes('flux')) return false
+    return true
+}
+
 const validarSubscription = async (req, res) => {
     const {sub, isUsable, useSubscription} = await getFunctionsForSubscription(req.get('Subscription'))
     if(!(await isUsable(req))){
@@ -22,22 +27,32 @@ const validarSubscription = async (req, res) => {
         res.status(401).send({error: 'Su suscripción no incluye la API de users. Actualice para incluirla.', date: new Date()})
         return false
     }
-    return useSubscription
+    return {useSubscription, sub}
 }
 
 tokenRouter.post('/verify-token', async (req, res) => {
     // Único caso en que el token va en el body
-    const useSubscription = await validarSubscription(req, res)
+    const {useSubscription, sub} = await validarSubscription(req, res)
+    if(useSubscription === undefined){
+        res.status(401).send({error: 'Token inválido o incorrecto', date: new Date()})
+        return
+    }
+    if(!subValidFlux(sub)){
+        res.status(401).send({error: 'Su suscripción no incluye la API de user. Actualice para incluirla.', date: new Date()})
+        return
+    }
     try {
         const tokenEn = req.body.token
+        await useSubscription()
         const token = jwt.verify(tokenEn, process.env.SECRET)
         console.log(token)
-        if(token && await validacionToken(token, req)){
+        if(token && await validacionToken(token, req, sub)){
             res.status(200).send({valid: true, token})
         }else{
             res.status(401).send({reset: true,valid: false})
         }
     }catch(err){
+        console.error(err)
         res.status(400).send({valid: false})
     }
 })

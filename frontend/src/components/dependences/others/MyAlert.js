@@ -1,6 +1,6 @@
 import { useState } from "react"
 import MyModal from "./MyModal"
-import { Button } from "@mui/material"
+import { Box, Button, TextField } from "@mui/material"
 
 
 const useAlert = (handleOpen=() => {}, handleClose=() => {}) => {
@@ -19,7 +19,14 @@ const useAlert = (handleOpen=() => {}, handleClose=() => {}) => {
         type: "",
         title: "",
         onConfirm: () => {},
-        text: ""
+        text: "",
+        needsPrompt: {
+            value: false,
+            data: {
+                placeholder: "",
+                onSubmit: () => {}
+            }
+        }
     })
 
     const typesIcons = {
@@ -42,33 +49,62 @@ const useAlert = (handleOpen=() => {}, handleClose=() => {}) => {
         alert.onConfirm()
     }
 
-    const getButtons = () => {
-        if(alert.isConfirmAlert){
+    const getPrompt = () => {
+        if(alert.needsPrompt.value){
             return (
                 <>
-                <Button onClick={toggleOpen} variant="outlined">Cerrar</Button>
-                <Button onClick={confirmar} variant="contained">Aceptar</Button>
-                </>
-            )
-        }else{
-            return (
-                <>
-                    <Button onClick={confirmar} variant="contained">Aceptar</Button>
+                <TextField name="inputValue" label={alert.needsPrompt.data.placeholder}/>
+                <br/>
                 </>
             )
         }
     }
 
 
+    const getButtons = () => {
+        if(alert.isConfirmAlert){
+            return (
+                <>
+                <Button onClick={toggleOpen} variant="outlined">Cerrar</Button>
+                <Button onClick={confirmar} type="submit" variant="contained">Aceptar</Button>
+                </>
+            )
+        }else{
+            return (
+                <>
+                    <Button onClick={confirmar} type="submit" variant="contained">Aceptar</Button>
+                </>
+            )
+        }
+    }
+
+    const getImageIcon = () => {
+        if(alert.type !== 'nothing'){
+            return (<img src={typesIcons[alert.type]} width="20%"/>)
+        }
+    }
+
+    const enviarFormulario = async event => {
+        if(alert.needsPrompt.value){
+            event.preventDefault()
+            await alert.needsPrompt.data.onSubmit(event.target.inputValue.value)
+        }else{
+            await alert.needsPrompt.data.onSubmit()
+        }
+    }
+
     const getAlert = () => (
         <MyModal handleClose={toggleOpen} open={alert.open} getBody={() => (
             <div style={{textAlign: 'center'}}>
-                <img src={typesIcons[alert.type]} width="20%"/>
+                {getImageIcon()}
                 <h1>{alert.title}</h1>
                 <p>{alert.text}</p>
-                <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                    {getButtons()}
-                </div>
+                <Box component="form" onSubmit={enviarFormulario}>
+                    {getPrompt()}
+                    <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                        {getButtons()}
+                    </div>
+                </Box>
             </div>
         )}/>
     )

@@ -13,7 +13,10 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String, // El email será único por tenant
         required: true,
-        unique: true
+        //unique: true
+    },
+    imageIcon: {
+        type: String,
     },
     passwordHash: {
         type: String,

@@ -1,8 +1,14 @@
 import axios from "axios"
 import uris from "../urls/uris"
+import subscription from "./subscription"
 
-const uri = uris.tokenControllerApi
 export const verifyToken = token => {
     const data = {token}
-    return axios.post(`${uri}/verify-token`, data)
+    const config = {
+        headers: {
+            Subscription: subscription
+        }
+    }
+
+    return axios.post(`${uris.tokenControllerApi}/verify-token`, data, config)
 }
