@@ -3,7 +3,7 @@ import useFormField from "../inputs/FormFile"
 
 const useStep3Contact = () => {
 
-    const uploadFile = useFormField({name: 'uploadingFiles', acceptedExtensions: ["jpg", "png", "jpeg"], multiple: true})
+    const uploadFile = useFormField({name: 'uploadingFiles', acceptedExtensions: ["jpg", "png", "jpeg"], multiple: true, text: "Subir imágenes"})
 
     const fields = {
         uploadFiles: {

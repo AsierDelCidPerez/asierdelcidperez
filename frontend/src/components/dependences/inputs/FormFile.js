@@ -4,11 +4,11 @@ import useImageService from "../../../services/images"
 import uris from '../../../urls/uris'
 
 
-const useFormField = ({name, acceptedExtensions, multiple=false}) => {
+const useFormField = ({name, acceptedExtensions, multiple=false, text="Subir archivos"}) => {
     const [loading, setLoading] = useState(false)
     const [styles, setStyles] = useState({
         dragOver: false,
-        incorrect: false
+        incorrect: {value: false, text: ""}
     })
     const image = useImageService()
     const [files, setFiles] = useState([])
@@ -47,15 +47,24 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
 
     const dropItems = async event => {
         event.preventDefault()
-        // setLoading(true)
-        let permitido = true;
+        let extensions = "";
+        acceptedExtensions.map((extension, index) => extensions += (extension + ((index+1 === acceptedExtensions.length) ? "" : ", ")))        // setLoading(true)
+        let permitido = {
+            value: true,
+            text: ""
+        };
         const archivos = event.dataTransfer ? event.dataTransfer.files : event.target.files
         for(let i=0;i<archivos.length;i++){
             if(!archivos[i].name.match(acceptedPattern)){
-                permitido = false
+                permitido.value = false
+                permitido.text = `Solo se admiten extensiones: ${extensions}.`
             }
         }
-        if(permitido) {
+        if(!multiple && archivos.length !== 1)  {
+            permitido.value = false
+            permitido.text = "Solo se admite un archivo."
+        }
+        if(permitido.value) {
             setStyles({
                 ...styles,
                 incorrect: false
@@ -70,14 +79,20 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
         else {
             setStyles({
                 ...styles,
-                incorrect: true
+                incorrect: {
+                    value: true,
+                    text: permitido.text
+                }
             })
             setFiles([])
             setLinks([])
             setTimeout(() => setStyles({
                 ...styles,
                 dragOver: false,
-                incorrect: false
+                incorrect: {
+                    value: false,
+                    text: "" 
+                }
             }), 2000)
             return
         }
@@ -96,11 +111,9 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
 
     // Mensaje de error si uploading es INCORRECT
     const getLeyenda = () => {
-        let extensions = "";
-        acceptedExtensions.forEach(extension => extensions += (extension + ", "))
         extensions = extensions.substring(0, extensions.length - 2)
         return (
-            <span style={{color: "white", textAlign: "center", fontWeight: 'bold'}}>Solo se admiten extensiones: {extensions}.</span>
+            <span style={{color: "white", textAlign: "center", fontWeight: 'bold'}}>{styles.incorrect.text}</span>
         )
     }
 
@@ -144,12 +157,12 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
     const multiplicidad = multiple ? {'multiple': true} : {}
     const getUploadFile = () => (
         <div style={{
-            padding: styles.dragOver ? '2.26%' : '2%',
+            padding: styles.dragOver ? '2%' : '2%',
             gap: '1%',
             style: 'block',
-            borderStyle: styles.dragOver ? '' : "dotted",
+            borderStyle: styles.dragOver ? 'solid' : "dotted",
             transition: "background .3s",
-            background: styles.incorrect ? "#8a0f0f" : (styles.dragOver ? "#2287f5" : 'white'),
+            background: styles.incorrect.value ? "#8a0f0f" : (styles.dragOver ? "#2287f5" : 'white'),
             color: styles.dragOver ? 'white' : 'black'
         }} onDragOver={dragOver(true)} onDragExit={dragOver(false)} onDrop={dropItems}>
             <div style={{
@@ -160,7 +173,7 @@ const useFormField = ({name, acceptedExtensions, multiple=false}) => {
                 <Button
                     {...uploadButtonProperties}
                     >
-                    Upload File
+                    {text}
                     <input
                         type="file"
                         hidden

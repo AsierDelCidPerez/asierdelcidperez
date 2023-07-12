@@ -20,10 +20,13 @@ const getFunctionsForSubscription = async valueSubscription => {
     const isUsable = async req => {
         // console.log("Origin: " + req.get('Origin'))
         if(sub === null) return false
+        
+        
         //Comentar al usar POSTMAN
-        /*
          if(!sub.allowedDomains.includes(req.get('Origin'))) return false
-        */
+        
+
+
         if(sub.tenant.nameId === 'root' && sub.name === 'root') return true
         // console.log(sub.expires)
         if(isBlockedTenant(sub.tenant)) return false

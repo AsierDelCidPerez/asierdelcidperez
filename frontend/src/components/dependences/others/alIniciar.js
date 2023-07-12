@@ -14,14 +14,15 @@ const useAtInit = () => {
         // Si no
         revisarCredencialesGuardadas()?.then(res => {
             if(res.data.valid){
-                const usuario = res.data.token.value
-                dispatch(actOfSetUser(usuario.name, usuario.apellidos, usuario.email, localStorage.getItem('userToken')))
+                const usuario = res.data.value
+                // console.log(usuario)
+                dispatch(actOfSetUser(usuario.name, usuario.apellidos, usuario.email, usuario.imageIcon, usuario.rank, usuario.blocked, localStorage.getItem('userToken')))
             }else{
                 localStorage.removeItem('userToken')
             }
-        }).catch(err => console.error(err))
-            localStorage.removeItem('userToken')
-        }
+        }).catch(err => localStorage.removeItem('userToken') )
+
+    }
 }
 
 module.exports = useAtInit

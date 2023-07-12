@@ -6,4 +6,5 @@ export const useToCloseSesion = () => {
     const dispatch = useDispatch()
     dispatch(actOfLogOut())
     localStorage.removeItem('userToken')
+    
 }

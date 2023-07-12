@@ -1,4 +1,4 @@
-import { Box, TextField, Button, recomposeColor } from "@mui/material"
+import { Box, TextField, Button } from "@mui/material"
 import { validarContrasena } from "./validadores"
 import useUserService from "../../../../../services/users"
 
@@ -13,7 +13,7 @@ const ChangePassword = ({tokenValidacion, setNotification, setRecordarContra}) =
             if(validarContrasena(nContra)){
                 try {
                     const res = await user.cambiarContrasenaByRemember(tokenValidacion, nContra)
-                    if(res.data.changePassword){
+                    if(res.data.changedPassword){
                         setRecordarContra({
                             value: 0,
                             email: "",

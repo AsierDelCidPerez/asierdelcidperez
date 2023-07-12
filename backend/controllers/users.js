@@ -33,7 +33,8 @@ const getTokenByUser = (usuario, ip) => {
             email: usuario.email, 
             tenant: usuario.tenant.nameId, 
             rank: usuario.rank, 
-            blocked: usuario.blocked
+            blocked: usuario.blocked,
+            imageIcon: usuario.imageIcon
         }, 
         date: new Date(), 
         ip
@@ -337,7 +338,7 @@ userRouter.put('/edit/:ajuste', async(req, res) => {
         return
     }
     if(ajuste === 'email' && tokenValidacion === null){
-        if(!uniqueForTenant(newValue)){
+        if(!(await uniqueForTenant(newValue, sub))){
             res.status(400).send({error: 'El email ya está en uso', date: new Date()})
             return
         }
@@ -349,7 +350,7 @@ userRouter.put('/edit/:ajuste', async(req, res) => {
                 const {value, codigo, date} = jwt.verify(tokenValidacion, process.env.SECRET)
                 if(new Date() <= new Date(new Date(date).getTime()+1800000)){
                     if(await bcrypt.compare(vCodigo, codigo)){
-                        const myUser = await user.findOneAndUpdate({email: myEmail, tenant: sub.tenant.id}, value, {new: true})
+                        const myUser = await user.findOneAndUpdate({email: myEmail, tenant: sub.tenant.id}, value.newValue, {new: true})
                         const ip = await bcrypt.hash(req.ip, 10)
                         const nToken = jwt.sign(getTokenByUser(myUser, ip), process.env.SECRET) 
                         const dataUser = {}
@@ -382,7 +383,7 @@ userRouter.put('/edit/:ajuste', async(req, res) => {
                     }catch(e){
                         res.status(400).send({error: 'Ha ocurrido un error al enviar el email de verificación', date: new Date()})
                     }
-                    res.status(400).send({verify: true, tokenValidacion, email: myEmail, error: 'Ha excedido el límite de tiempo para verificar su email. Hemos enviado otro email.'})
+                    res.status(400).send({verify: true, tokenValidacion: nToken, email: myEmail, error: 'Ha excedido el límite de tiempo para verificar su email. Hemos enviado otro email.'})
                     return
                 }
             }catch (e){
@@ -475,7 +476,11 @@ userRouter.post('/login', async(req, res) => {
     if(await bcrypt.compare(password, usuario.passwordHash)){
             const ip = await bcrypt.hash(req.ip, 10)
             const token = jwt.sign(getTokenByUser(usuario, ip), process.env.SECRET)
-            res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
+            if(subValidFlux(sub)){
+                res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
+            }else{
+                res.status(200).send({name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
+            }
     }else{
         res.status(404).send({error: 'La contraseña es incorrecta', date: new Date()})
     }

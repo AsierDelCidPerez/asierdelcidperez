@@ -98,11 +98,11 @@ app.use(function(req, res, next){
         <style>
             @keyframes myAnim {
                 0% {
-                    transform: translateX(-100%) rotate(-360deg);
+                    transform: rotate(-180deg);
                 }
 
                 100% {
-                    transform: translateX(100%) rotate(360deg);
+                    transform: rotate(180deg);
                 }
             }
             body {
@@ -121,7 +121,7 @@ app.use(function(req, res, next){
             font-size: 18px;
             }
             .rodando {
-                animation: myAnim 5s ease 0s infinite alternate-reverse both;
+                animation: myAnim 2.5s ease 0s infinite alternate-reverse both;
             }
             a {
             color: #fff;

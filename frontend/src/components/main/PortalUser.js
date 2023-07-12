@@ -7,6 +7,7 @@ import LanguageGrafica from "../dependences/home/LanguageGrafica"
 import Home from "../dependences/user/consoles/Home"
 import ChangePassword from "../dependences/user/consoles/ChangePassword"
 import { useSelector } from "react-redux"
+import EditSettings from "../dependences/user/consoles/EditSettings"
 
 const opcionesUsuario = [
     {
@@ -19,9 +20,9 @@ const opcionesUsuario = [
     {
         name: "Editar ajustes",
         icon: "fa-solid fa-pen-to-square",
-        onClick: () => {
-            
-        }
+        onClick: () => (
+            <EditSettings/>
+        )
     },
     {
         name: "Cambiar contraseña",

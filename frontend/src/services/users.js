@@ -16,6 +16,30 @@ const useUserService = () => {
         }
         return axios.post(uri, data, config)
     }
+    
+    const changeEmail = email => {
+        const uri = `${uris.userControllerUri}/edit/email`
+        const data = {email}
+        const config = {
+            headers: {
+                Subscription: subscription,
+                Authorization: token
+            }
+        }
+        return axios.put(uri, data, config)
+    }
+
+    const verifyEmailForChangingEmail = (tokenValidacion, vCodigo) => {
+        const uri = `${uris.userControllerUri}/edit/email`
+        const data = {tokenValidacion, vCodigo}
+        const config = {
+            headers: {
+                Subscription: subscription,
+                Authorization: token
+            }
+        }
+        return axios.put(uri, data, config)
+    }
 
     const login = ({email, password}) => {
         const uri = `${uris.userControllerUri}/login`
@@ -86,7 +110,7 @@ const useUserService = () => {
 
     return {
         register, login, cambiarContrasena, verificarCorreo, recordarContrasena, verificarCorreoByRemember,
-        cambiarContrasenaByRemember
+        cambiarContrasenaByRemember, changeEmail, verifyEmailForChangingEmail
     }
 }
 

@@ -51,11 +51,6 @@ userSchema.set('')
 
 userSchema.set('toJSON', {
     transform: (_, reqObj) => {
-        if(activarCifradoReposo){
-            reqObj.name = decrypt(reqObj.name)
-            reqObj.apellidos = decrypt(reqObj.apellidos)
-
-        }
         reqObj.id = reqObj._id
         delete reqObj._id
         delete reqObj.__v

@@ -20,6 +20,7 @@ import LoginForm from '../dependences/auth/login/Login';
 import SignIn from '../dependences/auth/login/SignIn';
 import { useNotification } from '../dependences/others/Notification';
 import { useSelector } from 'react-redux';
+import ListedNav from '../dependences/others/ListedNav';
 
 /*
 
@@ -33,44 +34,6 @@ Estructura de una page/setting
 
 */
 
-const pages = [
-    {
-        id: 1,
-        name: 'Contactar',
-        uri: '/contactar'
-    },
-    {
-        id: 2,
-        name: 'Documentación',
-        uri: '/legal'
-    },
-    {
-        id: 3,
-        name: 'Blog',
-        uri: '/blogs'
-    }
-];
-const settings = [
-  {
-    id: 1,
-    name: 'Profile',
-    uri: '/settings/profile',
-    icon: "fa-solid fa-user"
-  }, 
-  {
-    id: 2,
-    name: 'Dashboard',
-    uri: '/user',
-    icon: "fa-solid fa-table-columns"
-  },
-  {
-    id: 3,
-    divided: true,
-    name: 'Logout',
-    uri: '/actions/logout',
-    icon: "fa-solid fa-right-from-bracket"
-  }
-];
 
 const Navbar = () => {
     const navigate = useNavigate()
@@ -79,12 +42,81 @@ const Navbar = () => {
     const [isLoggingIn, setLoggingIn] = React.useState(false)
     const notification = useNotification()
     const [likeRegistering, setLikeRegistering] = React.useState(false);
+    const [activeElem, setActiveElem] = React.useState(0)
+    const [openSideBar, setOpenSideBar] = React.useState(false)
     const loggedIn = false
     const user = useSelector(state => state.user)
     // console.log(user)
 
+    const pages = [
+      {
+        id: 0,
+        name: 'Inicio',
+        icon: 'fa-solid fa-house',
+        onClick: () => {
+          navigate('/')
+          setActiveElem(0)
+        },
+        uri: '/'
+    },
+      {
+          id: 1,
+          name: 'Contactar',
+          icon: 'fa-solid fa-headset',
+          onClick: () => {
+            navigate('/contactar')
+            setActiveElem(1)
+          },
+          uri: '/contactar'
+      },
+      {
+          id: 2,
+          icon: 'fa-solid fa-gavel',
+          onClick: () => {
+            navigate('/legal')
+            setActiveElem(2)
+          },
+          name: 'Documentación',
+          uri: '/legal'
+      },
+      {
+          id: 3,
+          icon: 'fa-solid fa-blog',
+          onClick: () => {
+            navigate('/blogs')
+            setActiveElem(3)
+          },
+          name: 'Blog',
+          uri: '/blogs'
+      }
+  ];
+  const settings = [
+    {
+      id: 1,
+      name: 'Profile',
+      uri: '/settings/profile',
+      icon: "fa-solid fa-user"
+    }, 
+    {
+      id: 2,
+      name: 'Dashboard',
+      uri: '/user',
+      icon: "fa-solid fa-table-columns"
+    },
+    {
+      id: 3,
+      divided: true,
+      name: 'Logout',
+      uri: '/actions/logout',
+      icon: "fa-solid fa-right-from-bracket"
+    }
+  ];
+
+  
     const handleOpenNavMenu = (event) => {
-      setAnchorElNav(event.currentTarget);
+      setOpenSideBar(true)
+      // setActiveElem()
+      // setAnchorElNav(event.currentTarget);
     };
     const handleOpenUserMenu = (event) => {
       setAnchorElUser(event.currentTarget);
@@ -111,13 +143,22 @@ const Navbar = () => {
         )
   }
 
+  const getAvatar = () => {
+    if(user.imageIcon !== ""){
+      return (<Avatar alt={user.name + " " + user.apellidos} src={user.imageIcon} />)
+    }else{
+      return (<Avatar alt={user.name + " " + user.apellidos} >{user?.name?.toUpperCase().charAt(0)}</Avatar>)
+    }
+  }
+
   const getAvatarInfo = () => (
     <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Abrir ajustes">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" >{user?.name?.toUpperCase().charAt(0)}</Avatar>
+                  {getAvatar()}
                 </IconButton>
               </Tooltip>
+              
               <Menu
                 sx={{ mt: '45px' }}
                 id="menu-appbar"
@@ -134,6 +175,7 @@ const Navbar = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
+                
                 {settings.map((setting) => (
                   <div key={setting.id}>
                   {setting.divided ? <Divider/> : ''}
@@ -143,6 +185,7 @@ const Navbar = () => {
                   </div>
                 ))}
               </Menu>
+                
             </Box>
   )
 
@@ -167,6 +210,23 @@ const Navbar = () => {
     )}/>
   )
 
+  const getIconLogo = () => {
+    if(activeElem === 0){
+      return (
+        <img className="imgComputer" src="/logoBlanco.png" width="5%" style={{cursor: 'pointer'}} onClick={() => {
+          navigate('/')
+          setActiveElem(0)
+        }}/>
+      )
+    }
+    return (
+      <img className="imgComputer" src="/logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => {
+        navigate('/')
+        setActiveElem(0)
+      }}/>
+    )
+  }
+
   const getLoginButton = () => (
     <Button color="inherit" onClick={toggleLogin}>Acceder</Button>
   )
@@ -174,13 +234,15 @@ const Navbar = () => {
       <>
       {getTheModal()}
       <AppBar position="static">
+        <Box sx={{display: {xs: 'block', md: 'none', sm: 'block'}}}>       <ListedNav list={pages} openSideBar={openSideBar} onClose={e => {console.log(e.target)}} activeElem={activeElem} setActiveElem={setActiveElem} setOpenSideBar={setOpenSideBar}/>
+</Box>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             { 
             /* Logo */ 
             }
             
-              <img className="imgComputer" src="/logo.png" width="5%" style={{cursor: 'pointer'}} onClick={() => navigate('/')}/>
+            {getIconLogo()}
             {/*}
             <Typography
               variant="h6"
@@ -211,6 +273,7 @@ const Navbar = () => {
               >
                 <MenuIcon />
               </IconButton>
+              {/*
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorElNav}
@@ -229,12 +292,14 @@ const Navbar = () => {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page.id} onClick={() => navigate(page.uri)}>
+                
+                {pages.filter(page => page.id !== 0).map(page => (
+                  <MenuItem key={page.id} onClick={page.onClick}>
                     <Typography textAlign="center">{page.name}</Typography>
                   </MenuItem>
                 ))}
               </Menu>
+                */}
             </Box>
             <TerminalIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
             <Typography
@@ -261,10 +326,13 @@ const Navbar = () => {
             }
 
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
+              {pages.filter(page => page.id !== 0).map(page => (
                 <Button
                   key={page.id}
-                  color="inherit"
+                  sx={{
+                    color: (page.id === activeElem) ? 'white' : 'black'
+                  }}
+                  onClick={page.onClick}
                   component={Link}
                   to={page.uri}
                 >
