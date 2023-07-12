@@ -1,9 +1,14 @@
 const user = require('../../model/User')
 
 const existeUsuario = async (email, tenantId) => {
-    const userRes = await user.findOne({email, tenant: tenantId})
-    if(userRes === null) return false
-    return userRes
+    try{
+        const userRes = await user.findOne({email, tenant: tenantId})
+        // console.log(userRes)
+        if(userRes === null) return false
+        return userRes
+    }catch (e){
+        return false
+    }
 }
 
 const isBlocked = user => {

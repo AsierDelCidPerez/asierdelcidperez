@@ -45,7 +45,7 @@ tokenRouter.post('/verify-token', async (req, res) => {
         const tokenEn = req.body.token
         await useSubscription()
         const token = jwt.verify(tokenEn, process.env.SECRET)
-        console.log(token)
+        // console.log(token)
         if(token && await validacionToken(token, req, sub)){
             res.status(200).send({valid: true, token})
         }else{

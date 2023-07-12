@@ -14,6 +14,7 @@ const tokenRouter = require('./controllers/tokens')
 const { emailRouter } = require('./controllers/emails')
 const {tenRouter} = require('./controllers/tenants')
 const jwt = require('jsonwebtoken')
+
 mongoose.connect(process.env.MONGODB_URI).then(() => console.log("Connected to MONGODB"))
 
 bodyParser.json([this.options])

@@ -27,7 +27,7 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
       const res = await user.login(logData)
       localStorage.removeItem('userToken')
       localStorage.setItem('userToken', res.data.token)
-      dispatch(actOfSetUser(res.data.name, res.data.apellidos, res.data.email, res.data.token))
+      dispatch(actOfSetUser(res.data.name, res.data.apellidos, res.data.email, res.data.imageIcon,res.data.token))
     }catch(err) {
       setNotification({
           notification: err.response.data.error,

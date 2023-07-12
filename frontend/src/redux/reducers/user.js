@@ -40,7 +40,7 @@ const userReducer = (state=null, action) => {
     }
 }
 
-export const actOfSetUser = (name, apellidos, email, token) => {
+export const actOfSetUser = (name, apellidos, email, imageIcon, token) => {
     return {
         type: "SET_USR",
         user: {

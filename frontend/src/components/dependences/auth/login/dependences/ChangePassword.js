@@ -20,8 +20,8 @@ const ChangePassword = ({tokenValidacion, setNotification, setRecordarContra}) =
                             token: ""
                         })
                         setNotification({
-                            notification: e.response.data.error,
-                            isSuccess: false
+                            notification: "Se ha cambiado exitósamente la contraseña",
+                            isSuccess: true
                         })
                     }
                 } catch (e) {

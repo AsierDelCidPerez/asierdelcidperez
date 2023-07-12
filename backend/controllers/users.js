@@ -25,6 +25,21 @@ const subValidFlux = sub => {
     return true
 }
 
+const getTokenByUser = (usuario, ip) => {
+    return {
+        value: {
+            name: usuario.name, 
+            apellidos: usuario.apellidos, 
+            email: usuario.email, 
+            tenant: usuario.tenant.nameId, 
+            rank: usuario.rank, 
+            blocked: usuario.blocked
+        }, 
+        date: new Date(), 
+        ip
+    }
+}
+
 const subValidEmail = sub => {
     if(!sub.tenant.features.includes('email')) return false
     return true
@@ -32,13 +47,18 @@ const subValidEmail = sub => {
 
 const validarSubscription = async (req, res) => {
     const {sub, isUsable, useSubscription} = await getFunctionsForSubscription(req.get('Subscription'))
-    if(!(await isUsable(req))){
-        res.status(401).send({error: 'Su suscripción es inválida, probablemente haya expirado o rebasado el límite de llamadas adquirido.', date: new Date()})
-        return false
-    }
+    try{
+        if(!(await isUsable(req))){
+            res.status(401).send({error: 'Su suscripción es inválida, probablemente haya expirado o rebasado el límite de llamadas adquirido.', date: new Date()})
+            return false
+        }
 
-    if(!subValidUser(sub)){
-        res.status(401).send({error: 'Su suscripción no incluye la API de user. Actualice para incluirla.', date: new Date()})
+        if(!subValidUser(sub)){
+            res.status(401).send({error: 'Su suscripción no incluye la API de user. Actualice para incluirla.', date: new Date()})
+            return false
+        }
+    }catch(e) {
+        res.status(401).send({error: 'Su suscripción no es válida.', date: new Date()})
         return false
     }
     return {useSubscription, sub}
@@ -89,7 +109,7 @@ userRouter.put('/changePassword', async(req, res) => {
     const token = jwt.verify(req.get('Authorization'), process.env.SECRET)
     const value = token.value
     const {oldPassword, newPassword} = req.body
-    if(!(await validacionToken(token, req))) {
+    if(!(await validacionToken(token, req, sub))) {
         res.status(401).send({reset: true, error: "Token inválido o incorrecto", date: new Date()})
         return
     }
@@ -112,14 +132,26 @@ userRouter.put('/changePasswordByRemember', async(req, res) => {
     }
     await useSubscription()
     const {tokenValidacion, nPass} = req.body
-    const {verifiedEmailForChangePassword, email, date} = jwt.verify(tokenValidacion, process.env.SECRET)
-
+    let token, verifiedEmailForChangePassword, email, date
+    try{
+        token = jwt.verify(tokenValidacion, process.env.SECRET)
+        verifiedEmailForChangePassword = token.verifiedEmailForChangePassword
+        email = token.email
+        date = token.date
+    }catch (e) {
+        res.status(401).send({error: 'El token de validación es incorrecto'})
+        return
+    }
     if(verifiedEmailForChangePassword){
         if(validacionDatos({password: nPass})){
             if(new Date() <= new Date(new Date(date).getTime()+1800000)){
-                console.log(email)
-                console.log(sub.tenant.id)
+                // console.log(email)
+                // console.log(sub.tenant.id)
                 const myUser = await user.findOne({email, tenant: sub.tenant.id})
+                if(await bcrypt.compare(nPass, myUser.passwordHash)){
+                    res.status(400).send({error: 'La contraseña no puede ser la misma que la anterior.', date: new Date()})
+                    return
+                }
                 const newPass = await bcrypt.hash(nPass, 10)
                 myUser.passwordHash = newPass
                 await myUser.save()
@@ -152,7 +184,17 @@ userRouter.post('/verify-email', async(req, res) => {
     await useSubscription()
 
     const {tokenValidacion, vCodigo} = req.body
-    const {codigo, date, email} = jwt.verify(tokenValidacion, process.env.SECRET)
+    let token = ""
+    let codigo, date, email = ""
+    try{
+        token = jwt.verify(tokenValidacion, process.env.SECRET)
+        codigo = token.codigo
+        date = token.date
+        email = token.email
+    }catch(e){
+        res.status(401).send({error: 'El token de validación es incorrecto'})
+        return
+    }
     if(await bcrypt.compare(vCodigo, codigo)){
         if(new Date() <= new Date(new Date(date).getTime()+1800000)){
             console.log(email)
@@ -199,35 +241,43 @@ userRouter.post('/rememberPassword', async(req, res) => {
     })
 })
 
-userRouter.put('/edit/:ajuste', async(req, res) => {
+userRouter.put('/edit', async(req, res) => {
     const {useSubscription, sub} = await validarSubscription(req, res)
     await validarSubscription(req, res)
-    const ajuste = req.params.ajuste
     const token = jwt.verify(req.get('Authorization'), process.env.SECRET)
     if(useSubscription === undefined) return
     await useSubscription()
-    if(!validacionToken(token)){
-        res.status(401).send({error: "Token inválido o incorrecto", date: new Date()})
-        return
-    }
-    const {newValue} = req.body
-    if(ajuste === "passwordHash") {res.status(405).send({error: {
-        code: 324,
-        description: "Método no disponible en esta dirección de API",
-    }, date: new Date()})
-    return
-}
-    const availabeAjustes = ["name", "apellidos", "email"]
-    const myEmail = token.value.email
-    if(!availabeAjustes.includes(ajuste)){
-        res.status(405).send({error: {
-            code: 324,
-            description: "Método no disponible en esta dirección de API"
-        }, date: new Date()})
-        return
-    }
+
     // console.log(token)
-    const myUser = await existeUsuario(myEmail, sub.tenant.id)
+    // console.log(sub.id)
+
+    if(!(await validacionToken(token, req, sub))){
+        res.status(401).send({error: "Token inválido o incorrecto", date: new Date()})
+    return
+    }
+
+    // console.log(token)
+    // console.log("Tenant | " + sub.tenant)
+    if(!validacionDatos(req.body)){
+        res.status(400).send({error: 'Los datos no se ajustan al formato correcto', date: new Date()})
+        return
+    }
+
+    const dataUser = {}
+
+    for(let k in req.body){
+        if(k === 'name' || k === 'apellidos' || k === 'imageIcon'){
+            if(req.body[k]){
+                dataUser[k] = req.body[k]
+            }
+        }else{
+            res.status(400).send({error: 'Error en la petición', date: new Date()})
+        }
+    }
+    
+    console.log(dataUser)
+
+    const myUser = await user.findOneAndUpdate({email: token.value.email, tenant: sub.tenant.id}, dataUser, {new: true})
     if(myUser === false) {
         res.status(400).send({error: {
             code: 125,
@@ -235,22 +285,157 @@ userRouter.put('/edit/:ajuste', async(req, res) => {
         }, date: new Date()})
         return
     }
-    const nToken = {
-        ...token,
-        value: {
-            ...token.value,
-            [ajuste]: newValue
+
+    const newToken = jwt.sign(getTokenByUser(myUser, token.ip), process.env.SECRET)
+    try{
+    await myUser.save()
+    }catch(e) {
+        ServiceWorkerRegistration.status(500).send({error: 'Se ha producido un error', date: new Date()})
+    }
+    res.status(202).send({changed: true, 
+        newToken,
+        newData: {
+            email: myUser.email,
+            name: myUser.name,
+            apellidos: myUser.apellidos,
+            imageIcon: myUser.imageIcon,
+        }
+    })
+})
+
+userRouter.put('/edit/:ajuste', async(req, res) => {
+    const {useSubscription, sub} = await validarSubscription(req, res)
+    await validarSubscription(req, res)
+    const ajuste = req.params.ajuste
+    const token = jwt.verify(req.get('Authorization'), process.env.SECRET)
+    if(useSubscription === undefined) return
+    await useSubscription()
+    if(!(await validacionToken(token, req, sub))){
+        res.status(401).send({error: "Token inválido o incorrecto", date: new Date()})
+        return
+    }
+    const {[ajuste]: newValue, tokenValidacion=null, vCodigo=null} = req.body
+    if(ajuste === "passwordHash") {res.status(405).send({error: {
+        code: 324,
+        description: "Método no disponible en esta dirección de API",
+    }, date: new Date()})
+    return
+    }
+    const availabeAjustes = ["name", "apellidos", "email", "imageIcon"]
+    const myEmail = token.value.email
+   // console.log(myEmail + " " + newValue)
+    if(!availabeAjustes.includes(ajuste)){
+        res.status(405).send({error: {
+            code: 324,
+            description: "Método no disponible en esta dirección de API"
+        }, date: new Date()})
+        return
+    }
+
+    if(!validacionDatos(req.body)){
+        res.status(400).send({error: 'Los datos no se ajustan al formato correcto', date: new Date()})
+        return
+    }
+    if(ajuste === 'email' && tokenValidacion === null){
+        if(!uniqueForTenant(newValue)){
+            res.status(400).send({error: 'El email ya está en uso', date: new Date()})
+            return
         }
     }
-    const newToken = jwt.sign(nToken, process.env.SECRET)
-    myUser[ajuste] = newValue
-    await myUser.save()
-    res.status(202).send({success: true, 
-        newToken,
-        change: {[ajuste]: {
-        oldValue: myEmail,
-        newValue
-    }}, date: new Date()})
+    // console.log(token)
+    if(sub.tenant.aditionals.mfa){
+        if(tokenValidacion !== null){
+            try{
+                const {value, codigo, date} = jwt.verify(tokenValidacion, process.env.SECRET)
+                if(new Date() <= new Date(new Date(date).getTime()+1800000)){
+                    if(await bcrypt.compare(vCodigo, codigo)){
+                        const myUser = await user.findOneAndUpdate({email: myEmail, tenant: sub.tenant.id}, value, {new: true})
+                        const ip = await bcrypt.hash(req.ip, 10)
+                        const nToken = jwt.sign(getTokenByUser(myUser, ip), process.env.SECRET) 
+                        const dataUser = {}
+                        res.status(200).send({changed: true, token: nToken, newData: dataUser, newData: {
+                            email: myUser.email,
+                            imageIcon: myUser.imageIcon,
+                            name: myUser.name,
+                            apellidos: myUser.apellidos
+                        }})
+                    }else{
+                        res.status(400).send({error: 'El código de verificación es incorrecto', date: new Date()})
+                    }
+                }else{
+                    const orCodigo = generarCodigo(6)
+                    // console.log(orCodigo)
+                    const codigo = await bcrypt.hash(orCodigo, 10)
+                    const nToken = jwt.sign({
+                        verify: true, 
+                        value: {
+                            email: myEmail,
+                            newValue: {
+                                [ajuste]: newValue
+                            }
+                        },
+                        codigo,
+                        date: new Date()
+                    }, process.env.SECRET)
+                    try{
+                        await validarEmail(newValue, orCodigo)
+                    }catch(e){
+                        res.status(400).send({error: 'Ha ocurrido un error al enviar el email de verificación', date: new Date()})
+                    }
+                    res.status(400).send({verify: true, tokenValidacion, email: myEmail, error: 'Ha excedido el límite de tiempo para verificar su email. Hemos enviado otro email.'})
+                    return
+                }
+            }catch (e){
+                console.error(e)
+                res.status(401).send({error: 'El token es inválido', date: new Date()})
+            }
+        }else{
+            const orCodigo = generarCodigo(6)
+            const codigo = await bcrypt.hash(orCodigo, 10)
+            const tokenValidacion = jwt.sign({
+                verify: true, 
+                value: {
+                    email: myEmail,
+                    newValue: {
+                        [ajuste]: newValue
+                    }
+                },
+                codigo,
+                date: new Date()
+            }, process.env.SECRET)
+            try{
+                await validarEmail(newValue, orCodigo)
+            }catch(e){
+                res.status(400).send({error: 'Ha ocurrido un error al enviar el email de verificación', date: new Date()})
+            }
+            res.status(200).send({verify: true, tokenValidacion, email: myEmail})
+            return
+        }
+    }else{
+        const myUser = await existeUsuario(myEmail, sub.tenant.id)
+        if(myUser === false) {
+            res.status(400).send({error: {
+                code: 125,
+                description: "Token mal configurado"
+            }, date: new Date()})
+            return
+        }
+
+        const nToken = getTokenByUser(myUser)
+
+        // const nToken = jwt.sign({value: {name: myUser.name, apellidos: myUser.apellidos, email: myUser.email, tenant: myUser.tenant.nameId, rank: myUser.rank, blocked: myUser.blocked}, date: new Date(), ip}, process.env.SECRET)
+
+        const newToken = jwt.sign(nToken, process.env.SECRET)
+        myUser[ajuste] = newValue
+        await myUser.save()
+        res.status(202).send({success: true, 
+            newToken,
+            changed: true, 
+            newValue: {
+                [ajuste]: newValue
+            },
+            date: new Date()})
+    }
 })
 
 userRouter.post('/login', async(req, res) => {
@@ -289,8 +474,8 @@ userRouter.post('/login', async(req, res) => {
     }
     if(await bcrypt.compare(password, usuario.passwordHash)){
             const ip = await bcrypt.hash(req.ip, 10)
-            const token = jwt.sign({value: {name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, tenant: usuario.tenant.nameId, rank: usuario.rank, blocked: usuario.blocked}, date: new Date(), ip}, process.env.SECRET)
-            res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email})
+            const token = jwt.sign(getTokenByUser(usuario, ip), process.env.SECRET)
+            res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
     }else{
         res.status(404).send({error: 'La contraseña es incorrecta', date: new Date()})
     }

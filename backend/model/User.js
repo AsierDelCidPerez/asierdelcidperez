@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
+const { activarCifradoReposo } = require('../utils/encryptionCenter')
+const { decrypt } = require('dotenv')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -45,8 +47,15 @@ const userSchema = new mongoose.Schema({
 })
 userSchema.plugin(uniqueValidator)
 
+userSchema.set('')
+
 userSchema.set('toJSON', {
     transform: (_, reqObj) => {
+        if(activarCifradoReposo){
+            reqObj.name = decrypt(reqObj.name)
+            reqObj.apellidos = decrypt(reqObj.apellidos)
+
+        }
         reqObj.id = reqObj._id
         delete reqObj._id
         delete reqObj.__v
