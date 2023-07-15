@@ -23,7 +23,7 @@ const getFunctionsForSubscription = async valueSubscription => {
         
         
         //Comentar al usar POSTMAN
-         if(!sub.allowedDomains.includes(req.get('Origin'))) return false
+        // if(!sub.allowedDomains.includes(req.get('Origin'))) return false
         
 
 

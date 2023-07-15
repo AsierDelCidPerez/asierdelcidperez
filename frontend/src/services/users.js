@@ -29,6 +29,17 @@ const useUserService = () => {
         return axios.put(uri, data, config)
     }
 
+    const changeDataUser = data => {
+        const uri = `${uris.userControllerUri}/edit`
+        const config = {
+            headers: {
+                Subscription: subscription,
+                Authorization: token
+            }
+        }
+        return axios.put(uri, data, config)
+    }
+
     const verifyEmailForChangingEmail = (tokenValidacion, vCodigo) => {
         const uri = `${uris.userControllerUri}/edit/email`
         const data = {tokenValidacion, vCodigo}
@@ -110,7 +121,7 @@ const useUserService = () => {
 
     return {
         register, login, cambiarContrasena, verificarCorreo, recordarContrasena, verificarCorreoByRemember,
-        cambiarContrasenaByRemember, changeEmail, verifyEmailForChangingEmail
+        cambiarContrasenaByRemember, changeEmail, verifyEmailForChangingEmail, changeDataUser
     }
 }
 

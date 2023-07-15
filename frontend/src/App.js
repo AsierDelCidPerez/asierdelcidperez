@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import Navbar from './components/main/Navbar';
-import {Routes, Route} from 'react-router-dom'
+import {Routes, Route, useNavigate} from 'react-router-dom'
 import Conoceme from './components/main/Conoceme';
 import { Container } from '@mui/material';
 import Home from './components/main/Home';
@@ -15,8 +15,25 @@ import Login from './components/main/Login';
 import useAtInit from './components/dependences/others/alIniciar';
 import CerrarMySesion from './components/dependences/user/CerrarMySesion';
 import PortalUser from './components/main/PortalUser';
+import { useEffect } from 'react';
 
 function App() {
+  const navigate = useNavigate()
+  //Creamos la instancia
+
+
+  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const auth = urlParams.get('auth');
+    if(auth==='true'){
+      const urlParams = new URLSearchParams(window.location.search);
+      const returnUrl = urlParams.get('return')
+      const subscription = urlParams.get('sub')
+      navigate(`/auth/login?return=${returnUrl}&sub=${subscription}`)
+    }
+  }, [])
+
   useAtInit()
   return (
     <div>
@@ -24,9 +41,9 @@ function App() {
       <Container>
       <Notification/>
       <Routes>
+        <Route path="/auth/login" element={<Login/>}/>
         <Route path="/actions/logout" element={<CerrarMySesion/>}/>
         <Route path="/user" element={<PortalUser/>}/>
-        <Route path="/auth/login" element={<Login/>}/>
         <Route path="/blogs/:id" element={<ABlog/>}/>
         <Route path="/blogs" element={<Blogs/>}/>
         <Route path="/conoceme" element={<Conoceme/>}/>

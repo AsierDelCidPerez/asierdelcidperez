@@ -39,7 +39,7 @@ const EditSettings = () => {
             const res = await userService.verifyEmailForChangingEmail(changingEmail.tokenValidacion, vCodigo)
             try {
                 if(res.data.changed) {
-                    dispatch(actOfUpdateUser({name: res.data.newData.name, email: res.data.newData.email, imageIcon: res.data.newData.imageIcon, rank: res.data.newData.rank, blocked: res.data.newData.blocked, token: res.data.token}))
+                    dispatch(actOfUpdateUser({name: res.data.newData.name, email: res.data.newData.email, imageIcon: res.data.newData.imageIcon, token: res.data.token}))
                     localStorage.setItem('userToken', res.data.token)
                     setNotification({
                         notification: 'Ha cambiado exitósamente el email.',
@@ -77,6 +77,18 @@ const EditSettings = () => {
                         email: newEmail,
                         tokenValidacion: res.data.tokenValidacion
                     })
+                }else{
+                    dispatch(actOfUpdateUser({name: res.data.newData.name, email: res.data.newData.email, imageIcon: res.data.newData.imageIcon, token: res.data.token}))
+                    localStorage.setItem('userToken', res.data.token)
+                    setNotification({
+                        notification: 'Ha cambiado exitósamente el email.',
+                        isSuccess: true
+                    })
+                    setChangingEmail({
+                        value: 0,
+                        tokenValidacion: "",
+                        email: ""
+                    })
                 }
             }catch (e) {
                 setNotification({
@@ -91,6 +103,52 @@ const EditSettings = () => {
                 isSuccess: false
             })
         }
+    }
+
+    const getDisabled = () => {
+        if(uploadImages.loading){
+            return {disabled: true}
+            
+        }else{
+            return {}
+        }
+    }
+
+    const changePersonalization = async event => {
+        event.preventDefault()
+        const newName = event.target.name.value
+        const newImage = uploadImages.links[0]
+        const newApellidos = event.target.apellidos.value
+        const dataUser = {}
+        if(newName && newName !== "") {
+            dataUser.name = newName
+        }
+        if(newImage && newImage !== ""){
+            dataUser.imageIcon = newImage
+        }
+        if(newApellidos && newApellidos !== ""){
+            dataUser.apellidos = newApellidos
+        }
+
+        try{
+            const res = await userService.changeDataUser(dataUser)
+            if(res.data.changed){
+                const newDataUser = res.data.newData
+                const nToken = res.data.token
+                dispatch(actOfUpdateUser({...newDataUser, token: nToken}))
+                localStorage.setItem('userToken', nToken)
+                setNotification2({
+                    notification: 'Se han cambiado exitósamente los cambios',
+                    isSuccess: true
+                })
+            }
+        }catch (e){
+            setNotification2({
+                notification: e.response.data.error,
+                isSuccess: false
+            })
+        }
+
     }
 
     return (
@@ -116,13 +174,13 @@ const EditSettings = () => {
             <br/>
             <Card>
                 <CardContent>
-                    <Box component="form">
+                    <Box component="form" onSubmit={changePersonalization}>
                         {getNotification2()}<br/>
                         {uploadImages.getUploadFile() }<br/>
                         {getVerImagenDePerfilActual()}
                         <TextField fullWidth variant="outlined" type="name" name="name" placeholder={user?.name} label="Nombre"/><br/><br/>
                         <TextField fullWidth variant="outlined" type="apellidos" name="apellidos" placeholder={user?.apellidos} label="Apellidos"/><br/><br/>
-                        <Button fullWidth type="submit" variant="contained">Guardar cambios</Button>
+                        <Button {...getDisabled()} fullWidth type="submit" variant="contained">Guardar cambios</Button>
                     </Box>
                 </CardContent>
             </Card>
