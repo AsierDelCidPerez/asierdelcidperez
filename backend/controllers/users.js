@@ -60,8 +60,8 @@ const subValidEmail = sub => {
     return true
 }
 
-const validarSubscription = async (req, res) => {
-    const {sub, isUsable, useSubscription} = await getFunctionsForSubscription(req.get('Subscription'))
+const validarSubscription = async (req=null, res=null, subscription=null) => {
+    const {sub, isUsable, useSubscription} = subscription===null ? await getFunctionsForSubscription(req.get('Subscription')) : await getFunctionsForSubscription(subscription)
     try{
         if(!(await isUsable(req))){
             res.status(401).send({error: 'Su suscripción es inválida, probablemente haya expirado o rebasado el límite de llamadas adquirido.', date: new Date()})
@@ -88,7 +88,10 @@ const uniqueForTenant = async (email, sub) => { //El usuario debe ser único por
 
 
 const cambiarPassword = async (req, res, myUser) => {
+    const {useSubscription, sub} = await validarSubscription(req, res)
+    if(useSubscription === undefined) return
     const {oldPassword, newPassword} = req.body
+    await useSubscription()
     if(await bcrypt.compare(oldPassword, myUser.passwordHash)){
         if(oldPassword === newPassword){
             res.status(400).send({error: "No puedes usar la misma contraseña que tenías", date: new Date()})
@@ -218,7 +221,7 @@ userRouter.post('/verify-email', async(req, res) => {
         }else{
             const orCodigo = generarCodigo(6)
             const newCodigo = await bcrypt.hash(orCodigo, 10)
-            const tokenValidacion = jwt.sign({email: myEmail, codigo: newCodigo, date: new Date()}, process.env.SECRET)
+            const tokenValidacion = jwt.sign({email, codigo: newCodigo, date: new Date()}, process.env.SECRET)
             const html = `<p>Hemos detectado que desea registrarse con este correo: <strong>${value.email}</strong>. Para ello necesitar&aacute; hacer uso del c&oacute;digo de verificaci&oacute;n que le ser&aacute; solicitado por la p&aacute;gina web. El siguiente c&oacute;digo de seguridad es de un solo uso, es solamente v&aacute;lido durante los 30 minutos posteriores a su generaci&oacute;n. Al ser un c&oacute;digo confidencial, no debe compartirse con nadie. A continuaci&oacute;n encuentra el c&oacute;digo:</p><br/><p style="text-align: center;"><span style="font-size:26px;"><strong>${orCodigo}</strong></span></p><br/><p>Si necesita ayuda de cualquier tipo, no dude en ponerse en contacto con nosotros mediante nuestro correo: <a href="mailto:general.adelcidp@gmail.com?subject=Verificaci%C3%B3n%20del%20correo&amp;body=Necesito%20ayuda%20con%20la%20verificaci%C3%B3n%20del%20correo%20electr%C3%B3nico%20a%20la%20hora%20de%20registrar%20mi%20cuenta%20en%20la%20web.">general.adelcidp@gmail.com</a>.</p><br/><p>Muchas gracias.</p>`
             await enviarMensaje(null, value.email, 'Verificación de email', null, html)
             res.status(401).send({verify: true, error: 'El código de verificación ha expirado. Acabamos de enviar otro.', tokenValidacion})
@@ -378,14 +381,71 @@ userRouter.post('/auth/verify', async(req, res) => {
 
 })
 
+
+userRouter.post('/auth/static-login', async(req, res) => {
+    const {email, password, subscription} = req.body
+    try{
+        const {useSubscription, sub} = await validarSubscription(null, null, subscription)
+        //console.log(`${email} ${tenant}`)
+        const usuario = await existeUsuario(email, sub.tenant.id)
+        // console.log(tenant)
+
+        if(usuario === false){
+            res.status(404).send({error: 'No existe el email especificado', date: new Date()})
+            return
+        }
+        if(useSubscription === undefined) return
+        await useSubscription()
+        if(usuario?.blocked?.value !== -1){
+            /*
+                -1 -> Activo
+                -2 -> Bloqueado
+                (fecha en int) -> Bloqueo temporal hasta dicha fecha
+            */
+            const fechaActual = new Date()
+            if(usuario.blocked.value === -2){
+                res.status(401).send({error: "Ha sido bloqueado permanentemente. Causa: " + usuario.blocked.reason})
+                return
+            }
+            if(new Date(usuario.blocked.value) <= fechaActual){
+                usuario.blocked = {
+                    value: -1,
+                    reason: ""
+                }
+                await usuario.save()
+            }else{
+                const fechaBloqueo = new Date(usuario.blocked.value)
+                res.status(401).send({error: `Ha sido bloqueado hasta el ${fechaBloqueo.getDate()}/${fechaBloqueo.getMonth()+1}/${fechaBloqueo.getFullYear()}. Causa: ${usuario.blocked.reason}`})
+                return
+           }
+        }
+
+        if(await bcrypt.compare(password, usuario.passwordHash)){
+                const ip = await bcrypt.hash(req.ip, 10)
+                const tokenAuth = jwt.sign({...getTokenByUser(usuario, ip), sub}, process.env.SECRET)
+                if(subValidFlux(sub)){
+                    res.status(200).send({token: tokenAuth, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
+                }else{
+                    res.status(200).send({name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
+                }
+        }else{
+            res.status(404).send({error: 'La contraseña es incorrecta', date: new Date()})
+        }
+
+    }catch(e){
+        console.error(e)
+        res.status(400).send({error: 'Debe proveer un token de autenticación', date: new Date()})
+    }
+
+})
+
 userRouter.post('/auth/login', async(req, res) => {
     const {email, password, tokenAuth} = req.body
     try{
         const {value, tenant, date} = jwt.verify(tokenAuth, process.env.SECRET)
         const {useSubscription, sub} = await validarSubscription(req, res)
-        console.log(`${email} ${tenant}`)
+        //console.log(`${email} ${tenant}`)
         const usuario = await existeUsuario(email, tenant)
-    
         // console.log(tenant)
         if(new Date() > new Date(parseInt(date)+1800000)){
             res.status(404).send({error: 'El token de autenticación ha expirado', date: new Date()})

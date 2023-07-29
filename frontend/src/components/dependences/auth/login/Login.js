@@ -9,8 +9,10 @@ import RememberPassword from "./dependences/RememberPassword"
 import VerifyPage from "./dependences/VerifyEmail"
 import { validacionCodigoSexaNumerico } from "./dependences/validadores"
 import ChangePassword from "./dependences/ChangePassword"
+import subscription from "../../../../services/subscription"
 
-const LoginForm = ({toggleLikeRegistering, notification}) => {
+const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, tokenAuth=null, returnUrl=null}) => {
+  console.log(sub)
   const [getNotification, setNotification] = notification
   const user = useUserService()
   const [recordarContra, setRecordarContra] = useState({
@@ -22,12 +24,31 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
   const dispatch = useDispatch()
   const logIn = async event => {
     event.preventDefault()
-    const logData = {email: event.target.email.value, password: event.target.password.value}
-    try {
-      const res = await user.login(logData)
+    const logData = {email: event.target.email.value, password: event.target.password.value, tenant: event.target.tenant.value === "" ? subscription : event.target.tenant.value}
+    try{
+    if(onlyLogin){
+        if(tokenAuth === "null"){
+          const res = await user.loginGeneral(logData.email, logData.password, logData.tenant)
+            let argumentos = ""
+            for(let i in res.data){
+              argumentos+= `&${i}=${res.data[i]}`
+            }
+            window.location.href = `${returnUrl}?validated=true&date=${new Date()}${argumentos}`
+        }else{
+          await user.verificarLogin(logData.email, logData.password, tokenAuth)
+          window.location.href = `${returnUrl}?validated=true&date=${new Date()}&token=${tokenAuth}`
+          return
+        }
+        await user.verificarLogin(logData.email, logData.password, tokenAuth)
+        window.location.href = `${returnUrl}?validated=true&date=${new Date()}&token=${tokenAuth}`
+        return
+
+    }else{
+      const res = await user.login(logData, sub)
       localStorage.removeItem('userToken')
       localStorage.setItem('userToken', res.data.token)
       dispatch(actOfSetUser(res.data.name, res.data.apellidos, res.data.email, res.data.imageIcon,res.data.rank, res.data.blocked, res.data.token))
+    }
     }catch(err) {
       setNotification({
           notification: err.response.data.error,
@@ -39,7 +60,7 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
   const validarMyEmail = async vCodigo => {
     if(validacionCodigoSexaNumerico(vCodigo)){
       try{
-        const res = await user.verificarCorreoByRemember(recordarContra.token, vCodigo)
+        const res = await user.verificarCorreoByRemember(recordarContra.token, vCodigo, sub)
         if(res.data.verified){
           setRecordarContra({
             email: res.data.email,
@@ -80,12 +101,13 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
         <Box component="form" onSubmit={logIn} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', gap: '5px'}}>
           {getNotification !== null ? getNotification() : null}
           <h1>Acceder</h1>          
+            {sub === "null" && returnUrl !== null ? (<TextField fullwidth type="text" variant="outlined" name="tenant" label="Suscripción"/>): (<></>)}
             <TextField fullwidth variant="outlined" autoComplete='off' name="email" label="Email"/><br/>
             <TextField fullwidth type="password" variant="outlined" name="password" label="Contraseña"/>
             <div style={{display: 'flex', justifyContent: 'right', flexDirection: 'column', textAlign: 'right'}}>
             <FormControlLabel name="recordarCredenciales" control={<Checkbox />} label="Recordar credenciales" />
-              <Link to="#" style={{cursor: 'pointer'}} onClick={() => setRecordarContra({...recordarContra, value: 1})}>¿Has olvidado la contraseña?</Link>
-              <Link to="#" onClick={toggleLikeRegistering} style={{cursor: 'pointer'}}>¿No tienes cuenta? Registrarse</Link>
+              {sub !== null ? (<Link to="#" style={{cursor: 'pointer'}} onClick={() => setRecordarContra({...recordarContra, value: 1})}>¿Has olvidado la contraseña?</Link>) : (<></>)}
+              {!onlyLogin ? (<Link to="#" onClick={toggleLikeRegistering} style={{cursor: 'pointer'}}>¿No tienes cuenta? Registrarse</Link>) : (<></>)}
             </div>
             <Button variant="contained" type="submit">Acceder</Button>
         </Box>
@@ -94,7 +116,7 @@ const LoginForm = ({toggleLikeRegistering, notification}) => {
     case 1:
       return (
         <>
-          <RememberPassword setRecordarContra={setRecordarContra} setNotification={setNotification} getNotification={getNotification}/>
+          <RememberPassword sub={sub} setRecordarContra={setRecordarContra} setNotification={setNotification} getNotification={getNotification}/>
           </>
       )
     case 2:

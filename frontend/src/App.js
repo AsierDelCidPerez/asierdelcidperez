@@ -16,11 +16,11 @@ import useAtInit from './components/dependences/others/alIniciar';
 import CerrarMySesion from './components/dependences/user/CerrarMySesion';
 import PortalUser from './components/main/PortalUser';
 import { useEffect } from 'react';
+import PortalAdmin from './components/main/PortalAdmin';
 
 function App() {
   const navigate = useNavigate()
   //Creamos la instancia
-
 
   
   useEffect(() => {
@@ -30,7 +30,7 @@ function App() {
       const urlParams = new URLSearchParams(window.location.search);
       const returnUrl = urlParams.get('return')
       const subscription = urlParams.get('sub')
-      navigate(`/auth/login?return=${returnUrl}&sub=${subscription}`)
+      navigate(`/auth/login?auth=true&return=${returnUrl}&sub=${subscription}&tokenauth=${urlParams.get('tokenauth')}`)
     }
   }, [])
 
@@ -41,6 +41,7 @@ function App() {
       <Container>
       <Notification/>
       <Routes>
+        <Route path="/admin" element={<PortalAdmin/>}/>
         <Route path="/auth/login" element={<Login/>}/>
         <Route path="/actions/logout" element={<CerrarMySesion/>}/>
         <Route path="/user" element={<PortalUser/>}/>

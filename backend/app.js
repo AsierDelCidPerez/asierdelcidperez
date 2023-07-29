@@ -14,6 +14,7 @@ const tokenRouter = require('./controllers/tokens')
 const { emailRouter } = require('./controllers/emails')
 const {tenRouter} = require('./controllers/tenants')
 const jwt = require('jsonwebtoken')
+const { adminRouter } = require('./controllers/admin')
 
 mongoose.connect(process.env.MONGODB_URI).then(() => console.log("Connected to MONGODB"))
 
@@ -21,6 +22,7 @@ bodyParser.json([this.options])
 app.use(express.json())
 app.use(cors())
 
+app.use('/api/admin', adminRouter)
 app.use('/api/images', imageRouter)
 app.use('/api/tenants', tenRouter)
 app.use('/api/emails', emailRouter)

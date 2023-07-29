@@ -7,7 +7,7 @@ import useAlert from "../../others/MyAlert"
 import { useState } from "react"
 import VerifyPage from "./dependences/VerifyEmail"
 
-const SignIn = ({toggleLikeRegistering, notification}) => {
+const SignIn = ({toggleLikeRegistering, notification, sub=null}) => {
     const [getNotification, setNotification] = notification
     const userService = useUserService()
     // const {setAlert, getAlert} = useAlert()
@@ -29,7 +29,7 @@ const SignIn = ({toggleLikeRegistering, notification}) => {
     const completarRegistro = async ({nombre, apellidos, email, contrasena}) => {
         // console.log(email)
         try{
-            const res = await userService.register({name: nombre, apellidos, email, password: contrasena})
+            const res = await userService.register({name: nombre, apellidos, email, password: contrasena, sub})
             if(res.data.verify){
                 setVerifying({
                     value: true,
@@ -137,7 +137,7 @@ const SignIn = ({toggleLikeRegistering, notification}) => {
 
     const validarCorreo = async vCodigo => {
         try{
-            const res = await userService.verificarCorreo(verifying.token, vCodigo)
+            const res = await userService.verificarCorreo(verifying.token, vCodigo, sub)
             if(res.status === 200 && res.data.verified === true){
                 setNotification({
                     notification: 'Se ha registrado exitósamente',

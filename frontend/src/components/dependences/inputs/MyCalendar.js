@@ -1,5 +1,5 @@
 import { Calendar, Whisper, Popover, Badge } from 'rsuite';
-import "rsuite/dist/rsuite.css"
+
 
 function getTodoList(date) {
   const day = date.getDate();
@@ -70,7 +70,8 @@ const MyCalendar = ({fullCalendar}) => {
     return null;
   }
 
-  return <Calendar compact  renderCell={renderCell} />;
+  
+  return <Calendar compact renderCell={renderCell} />;
 };
 
 export default MyCalendar

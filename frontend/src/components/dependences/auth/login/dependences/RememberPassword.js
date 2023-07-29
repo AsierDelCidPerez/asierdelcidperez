@@ -3,14 +3,14 @@ import { Box, TextField, Button } from "@mui/material"
 import { validarEmail} from "./validadores"
 import useUserService from "../../../../../services/users"
 
-const RememberPassword = ({getNotification, setNotification, setRecordarContra}) => {
+const RememberPassword = ({getNotification, setNotification, setRecordarContra, sub}) => {
     const user = useUserService()
     const recordarPassword = async event => {
         event.preventDefault()
         const email = event.target.email.value
         if(validarEmail(email)){
             try{
-                const res = await user.recordarContrasena(email)
+                const res = await user.recordarContrasena(email, sub)
                 if(res.data.verify){
                     setRecordarContra({
                         value: 2,
