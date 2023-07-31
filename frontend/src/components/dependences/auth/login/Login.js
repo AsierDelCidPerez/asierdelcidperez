@@ -24,6 +24,7 @@ const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, to
   const dispatch = useDispatch()
   const logIn = async event => {
     event.preventDefault()
+    const recordar = event.target.recordarCredenciales.value
     const logData = {email: event.target.email.value, password: event.target.password.value, tenant: event.target.tenant.value === "" ? subscription : event.target.tenant.value}
     try{
     if(onlyLogin){
@@ -36,17 +37,16 @@ const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, to
             window.location.href = `${returnUrl}?validated=true&date=${new Date()}${argumentos}`
         }else{
           await user.verificarLogin(logData.email, logData.password, tokenAuth)
-          window.location.href = `${returnUrl}?validated=true&date=${new Date()}&token=${tokenAuth}`
+          window.location.href = `${returnUrl}?validated=true&recordar=${recordarContra ? "true": "false"}&date=${new Date()}&token=${tokenAuth}`
           return
         }
         await user.verificarLogin(logData.email, logData.password, tokenAuth)
-        window.location.href = `${returnUrl}?validated=true&date=${new Date()}&token=${tokenAuth}`
+        window.location.href = `${returnUrl}?validated=true&recordar=${recordarContra ? "true": "false"}&date=${new Date()}&token=${tokenAuth}`
         return
-
     }else{
       const res = await user.login(logData, sub)
       localStorage.removeItem('userToken')
-      localStorage.setItem('userToken', res.data.token)
+      if(recordarContra) localStorage.setItem('userToken', res.data.token)
       dispatch(actOfSetUser(res.data.name, res.data.apellidos, res.data.email, res.data.imageIcon,res.data.rank, res.data.blocked, res.data.token))
     }
     }catch(err) {

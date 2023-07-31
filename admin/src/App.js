@@ -2,9 +2,30 @@ import logo from './logo.svg';
 import './App.css';
 import {Button, Card, CardContent, CardHeader, Typography} from '@mui/material'
 import uris from './settings/uris';
+import {useDispatch} from 'react-redux'
+import { actOfSetAdmin } from './redux/reducers/admin';
 
 const App = () => {
   const admin = localStorage.getItem('admin')
+
+  const urlParams = new URLSearchParams(window.location.search)
+
+  const dispatch = useDispatch()
+  if(urlParams.get('validated') === "true"){
+    const data = {
+      tokenAdmin: urlParams.get('token'),
+      name: urlParams.get('name'),
+      apellidos: urlParams.get('apellidos'),
+      email: urlParams.get('email'),
+      imageIcon: urlParams.get('imageIcon')
+    }
+
+
+
+    dispatch(actOfSetAdmin())
+
+  }
+
 
   const authAdmin = () => {
     const returnUrl = window.location.href
