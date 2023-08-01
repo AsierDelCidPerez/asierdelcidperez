@@ -8,7 +8,7 @@ const adminReducer = (state=null,action) => {
     }
 }
 
-export const actOfSetAdmin = (tokenAdmin, name, apellidos, email, imageIcon, rights) => {
+export const actOfSetAdmin = ({tokenAdmin, name, apellidos, email, imageIcon, rights}) => {
     return {
         type: "SET_ADMIN",
         admin: {

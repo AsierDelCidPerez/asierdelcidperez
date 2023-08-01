@@ -4,14 +4,18 @@ import {Button, Card, CardContent, CardHeader, Typography} from '@mui/material'
 import uris from './settings/uris';
 import {useDispatch} from 'react-redux'
 import { actOfSetAdmin } from './redux/reducers/admin';
+import useAdminService from './services/admin';
 
 const App = () => {
   const admin = localStorage.getItem('admin')
+
+  const adminService = useAdminService()
 
   const urlParams = new URLSearchParams(window.location.search)
 
   const dispatch = useDispatch()
   if(urlParams.get('validated') === "true"){
+    const recordar = urlParams.get('recordar')
     const data = {
       tokenAdmin: urlParams.get('token'),
       name: urlParams.get('name'),
@@ -20,9 +24,18 @@ const App = () => {
       imageIcon: urlParams.get('imageIcon')
     }
 
+    
 
-
-    dispatch(actOfSetAdmin())
+    adminService.verifyRights(data.tokenAdmin).then(res => {
+      console.log(res.data)
+      data.rights = res.data.rights
+      data.tokenAdmin = res.data.tokenAdmin
+      console.log(data)
+      dispatch(actOfSetAdmin(data))
+      if(recordar){
+        localStorage.setItem('adminToken', data.tokenAdmin)
+      }
+    })
 
   }
 

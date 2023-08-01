@@ -60,10 +60,10 @@ const subValidEmail = sub => {
     return true
 }
 
-const validarSubscription = async (req=null, res=null, subscription=null) => {
+const validarSubscription = async (req=null, res=null, subscription=null, origin=true) => {
     const {sub, isUsable, useSubscription} = subscription===null ? await getFunctionsForSubscription(req.get('Subscription')) : await getFunctionsForSubscription(subscription)
     try{
-        if(!(await isUsable(req))){
+        if(!(await isUsable(req, origin))){
             res.status(401).send({error: 'Su suscripción es inválida, probablemente haya expirado o rebasado el límite de llamadas adquirido.', date: new Date()})
             return false
         }
@@ -72,11 +72,22 @@ const validarSubscription = async (req=null, res=null, subscription=null) => {
             res.status(401).send({error: 'Su suscripción no incluye la API de user. Actualice para incluirla.', date: new Date()})
             return false
         }
+
     }catch(e) {
         res.status(401).send({error: 'Su suscripción no es válida.', date: new Date()})
         return false
     }
-    return {useSubscription, sub}
+
+    const revisarFeatures = (features=[], res) => {
+        for(let k in features){
+            if(!sub.tenant.features.includes(k)) {
+                res.status(401).send({error: `Su suscripción no incluye la api ${k} necesaria para la operación solicitada`, date: new Date()})
+                return false
+            }
+        }
+    }
+
+    return {useSubscription, sub, revisarFeatures}
 }
 
 
@@ -350,11 +361,11 @@ userRouter.post('/auth/token', async(req, res) => {
 
 userRouter.post('/auth/verify', async(req, res) => {
     const {tokenAuth} = req.body
-    const {useSubscription, sub} = await validarSubscription(req, res)
+    const {useSubscription, isValid, sub} = await validarSubscription(req, res)
     try{
         await validarSubscription(req, res)
         if(useSubscription === undefined) return
-        await useSubscription()
+
         const {value, tenant, date} = jwt.verify(tokenAuth, process.env.SECRET)
         const myToken = await AuthToken.findOne({value, tenant})
         if(new Date() > new Date(parseInt(date)+1800000)){
@@ -384,8 +395,17 @@ userRouter.post('/auth/verify', async(req, res) => {
 
 userRouter.post('/auth/static-login', async(req, res) => {
     const {email, password, subscription} = req.body
+
+    let {useSubscription, sub} = await validarSubscription(req, res)
+
+    if(useSubscription === undefined) return
+
     try{
-        const {useSubscription, sub} = await validarSubscription(null, null, subscription)
+        let mySub = {useSubscription, sub}
+        if(sub.tenant.nameId === 'root') mySub = await validarSubscription(req, res, subscription, false)
+        useSubscription = mySub.useSubscription
+        sub = mySub.sub
+        if(useSubscription === undefined) return
         //console.log(`${email} ${tenant}`)
         const usuario = await existeUsuario(email, sub.tenant.id)
         // console.log(tenant)
@@ -422,7 +442,7 @@ userRouter.post('/auth/static-login', async(req, res) => {
 
         if(await bcrypt.compare(password, usuario.passwordHash)){
                 const ip = await bcrypt.hash(req.ip, 10)
-                const tokenAuth = jwt.sign({...getTokenByUser(usuario, ip), sub}, process.env.SECRET)
+                const tokenAuth = jwt.sign({...getTokenByUser(usuario, ip), sub: sub.value}, process.env.SECRET)
                 if(subValidFlux(sub)){
                     res.status(200).send({token: tokenAuth, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
                 }else{

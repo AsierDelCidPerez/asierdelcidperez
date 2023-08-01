@@ -17,13 +17,13 @@ const generateFormatForSubscription = () => {
 
 const getFunctionsForSubscription = async valueSubscription => {
     const sub = await subscription.findOne({value: valueSubscription}).populate('tenant')
-    const isUsable = async req => {
+    const isUsable = async (req, origin) => {
         // console.log("Origin: " + req.get('Origin'))
         if(sub === null) return false
         
         
         //Comentar al usar POSTMAN
-        // if(!sub.allowedDomains.includes(req.get('Origin'))) return false
+        if(origin && !sub.allowedDomains.includes(req.get('Origin'))) return false
         
 
 
