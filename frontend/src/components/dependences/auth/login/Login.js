@@ -12,6 +12,7 @@ import ChangePassword from "./dependences/ChangePassword"
 import subscription from "../../../../services/subscription"
 
 const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, tokenAuth=null, returnUrl=null}) => {
+  sub = onlyLogin ? sub: subscription
   console.log(sub)
   const [getNotification, setNotification] = notification
   const user = useUserService()
@@ -25,9 +26,9 @@ const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, to
   const logIn = async event => {
     event.preventDefault()
     const recordar = event.target.recordarCredenciales.value
-    const logData = {email: event.target.email.value, password: event.target.password.value, tenant: event.target.tenant.value === "" ? subscription : event.target.tenant.value}
     try{
     if(onlyLogin){
+       const logData = {email: event.target.email.value, password: event.target.password.value, tenant: !event.target.tenant.value  ? subscription : event.target.tenant.value}
         if(tokenAuth === "null"){
           const res = await user.loginGeneral(logData.email, logData.password, logData.tenant)
             let argumentos = ""
@@ -44,7 +45,8 @@ const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, to
         window.location.href = `${returnUrl}?validated=true&recordar=${recordarContra ? "true": "false"}&date=${new Date()}&token=${tokenAuth}`
         return
     }else{
-      const res = await user.login(logData, sub)
+      const logData = {email: event.target.email.value, password: event.target.password.value}
+      const res = await user.login(logData)
       localStorage.removeItem('userToken')
       if(recordarContra) localStorage.setItem('userToken', res.data.token)
       dispatch(actOfSetUser(res.data.name, res.data.apellidos, res.data.email, res.data.imageIcon,res.data.rank, res.data.blocked, res.data.token))
