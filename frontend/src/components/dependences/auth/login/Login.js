@@ -11,8 +11,8 @@ import { validacionCodigoSexaNumerico } from "./dependences/validadores"
 import ChangePassword from "./dependences/ChangePassword"
 import subscription from "../../../../services/subscription"
 
-const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, tokenAuth=null, returnUrl=null}) => {
-  sub = onlyLogin ? sub: subscription
+const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin=false, tokenAuth=null, returnUrl=null}) => {
+  sub = onlyLogin ? sub : subscription
   console.log(sub)
   const [getNotification, setNotification] = notification
   const user = useUserService()
@@ -25,7 +25,8 @@ const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, to
   const dispatch = useDispatch()
   const logIn = async event => {
     event.preventDefault()
-    const recordar = event.target.recordarCredenciales.value
+    const recordar = event.target.recordarCredenciales.checked
+    // console.log("Recordando " + recordar)
     try{
     if(onlyLogin){
        const logData = {email: event.target.email.value, password: event.target.password.value, tenant: !event.target.tenant.value  ? subscription : event.target.tenant.value}
@@ -35,14 +36,14 @@ const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin, to
             for(let i in res.data){
               argumentos+= `&${i}=${res.data[i]}`
             }
-            window.location.href = `${returnUrl}?validated=true&date=${new Date()}${argumentos}`
+            window.location.href = `${returnUrl}?validated=true&recordar=${recordar ? "true": "false"}&date=${new Date()}${argumentos}`
         }else{
           await user.verificarLogin(logData.email, logData.password, tokenAuth)
-          window.location.href = `${returnUrl}?validated=true&recordar=${recordarContra ? "true": "false"}&date=${new Date()}&token=${tokenAuth}`
+          window.location.href = `${returnUrl}?validated=true&recordar=${recordar ? "true": "false"}&date=${new Date()}&token=${tokenAuth}`
           return
         }
         await user.verificarLogin(logData.email, logData.password, tokenAuth)
-        window.location.href = `${returnUrl}?validated=true&recordar=${recordarContra ? "true": "false"}&date=${new Date()}&token=${tokenAuth}`
+        window.location.href = `${returnUrl}?validated=true&recordar=${recordar ? "true": "false"}&date=${new Date()}&token=${tokenAuth}`
         return
     }else{
       const logData = {email: event.target.email.value, password: event.target.password.value}

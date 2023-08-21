@@ -62,16 +62,19 @@ const validarSubscription = async (req, res) => {
 
 adminRouter.post('/verify-rights', async(req, res) => {
     try{
+    const services = req.body.services
     const adminToken = jwt.verify(req.body.adminToken, process.env.SECRET)
 
     const subscription = adminToken.sub
 
-    const {useSubscription, sub} = await validarSubscription(req, res, subscription, false)
+    const {useSubscription, sub, revisarFeatures} = await validarSubscription(req, res, subscription, false)
 
     if(useSubscription === undefined) return
 
     await useSubscription()
-    
+
+    if(!revisarFeatures(services, res)) return
+
     const myUser = await User.findOne({email: adminToken.value.email, tenant: sub.tenant.id})
 
     const diRank = await Rank.findOne({nameId: myUser.rank})
