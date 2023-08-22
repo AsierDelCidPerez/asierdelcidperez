@@ -5,18 +5,12 @@ import subscription from '../settings/subscription'
 const useAdminService = () => {
     const uri = uris.admin
 
-    const verifyRights = (adminToken, services) => {
-        const headers = {
-            headers: {
-                Subscription: subscription
-            }
-        }
-        return axios.post(`${uri}/verify-rights`, {adminToken, services}, headers)
-    }
+    const verifyRights = (adminToken, services) => axios.post(`${uri}/verify-rights`, {adminToken, services})
 
+    const verifyRightsByToken = (rightsToken, services) => axios.post(`${uri}/verify-rights/token`, {rightsToken, services})
 
     return {
-        verifyRights
+        verifyRights, verifyRightsByToken
     }
 
 }

@@ -68,3 +68,11 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### Créditos
+
+<a href="https://www.flaticon.es/iconos-gratis/admin-ui" title="admin ui iconos">Admin ui iconos creados por Vector Stall - Flaticon</a>
+
+Imagen de <a href="https://pixabay.com/es/users/sambeetarts-1339110/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=1732847">Sambeet D</a> en <a href="https://pixabay.com/es//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=1732847">Pixabay</a>
+
+Foto de Roberto Nickson: https://www.pexels.com/es-es/foto/ciudad-cerca-de-la-montana-durante-la-hora-dorada-2525903/

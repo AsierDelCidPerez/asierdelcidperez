@@ -4,7 +4,7 @@ import thunk from 'redux-thunk'
 import {composeWithDevTools} from 'redux-devtools-extension'
 
 const reducers = combineReducers({
-    admin: adminReducer
+    admin: adminReducer,
 })
 
 const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunk)))

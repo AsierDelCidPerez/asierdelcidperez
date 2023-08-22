@@ -78,14 +78,17 @@ const validarSubscription = async (req=null, res=null, subscription=null, origin
         return false
     }
 
-    const revisarFeatures = (features=[], res) => {
-        for(let k in features){
+    const revisarFeatures = (features=[]) => {
+        // console.error(features)
+        for(let k of features){
             if(!sub.tenant.features.includes(k)) {
                 res.status(401).send({error: `Su suscripción no incluye la api ${k} necesaria para la operación solicitada`, date: new Date()})
-                return false
+                return true
             }
         }
     }
+
+    if(revisarFeatures(['user'])) return false
 
     return {useSubscription, sub, revisarFeatures}
 }
