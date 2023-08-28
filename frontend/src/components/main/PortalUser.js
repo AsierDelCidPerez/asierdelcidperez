@@ -55,14 +55,13 @@ const PortalUser = () => {
     const navigate = useNavigate()
    
     // QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
-    /*
+    
     useEffect(() => {
         if(user === null) navigate('/')
     }, [])
-    */
-
+    
     //QUITAR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
-    /*
+    
     const getPortal = () => user !== null ? 
     (
     <div>
@@ -101,13 +100,14 @@ const PortalUser = () => {
     </div>)
     :
     (<div></div>)
-    */
+    
     
 
     {
         /*Interfaz para el portal de usuario en ordenador */
     }
     // AÑADIR COMENTARIO PARA REESTRINGIR ACCESO A USUARIOS
+    /*
     const getPortal = () => (
         <div>
         <Box sx={{display: {md: 'block', sm: 'none', xs: 'none'}}}>
@@ -130,10 +130,6 @@ const PortalUser = () => {
         </Box>
 
 
-
-        {
-            /*Interfaz para el portal de usuario en móvil */
-        }
         <Box sx={{display: {md: 'none', sm: 'block'}}}>
             <ListedNav list={opcionesUsuario} openSideBar={openSideBar} onClose={e => {console.log(e.target)}} activeElem={activeElem} setActiveElem={setActiveElem} setOpenSideBar={setOpenSideBar}/>
             <div style={{textAlign: 'center'}}>
@@ -152,7 +148,7 @@ const PortalUser = () => {
         <br/>
     </div>
     )
-    
+    */
 
     return (
         <div>

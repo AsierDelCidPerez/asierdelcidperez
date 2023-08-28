@@ -48,7 +48,12 @@ const tenRouter = require('express').Router()
             return finalChildren
         }
     }
-    
+
+    const getChildrenArrayPlain = async nameId => {
+        const children = await getChildrenArray(nameId)
+        return children.filter(child => child !== nameId)
+    }
+
     const getChildren = async nameId => {
         const tenWithChildren = await Tenant.findOne({nameId}).populate('subTenants')
         // console.log(tenWithChildren.subTenants.map(ten => ten.nameId))
@@ -67,8 +72,25 @@ const tenRouter = require('express').Router()
             return finalChildren
         }
     }
+
+    
     const isBlockedTenant = async tenant => {
         return !tenant.enabled
+    }
+
+    
+    const getTenantByNameId = async nameId => {
+        const tenant = await Tenant.findOne({nameId})
+        return tenant
+    }
+
+    const getTenantsByNameId = async (...nameIds) => {
+        const tenantNameIds = []
+        nameIds.forEach(ten => {
+            tenantNameIds.push({nameId: ten})
+        })
+        const tenants = await Tenant.find({$or: tenantNameIds})
+        return tenants
     }
 
 
@@ -79,5 +101,6 @@ tenRouter.get('test', async(req, res) => {
 
 
 module.exports = {
-    tenRouter, registrarUsuarioEnTenant, isBlockedTenant
+    tenRouter, registrarUsuarioEnTenant, isBlockedTenant, getChildren, getChildrenArray,
+    getTenantsByNameId, getTenantByNameId, getChildrenArrayPlain
 }

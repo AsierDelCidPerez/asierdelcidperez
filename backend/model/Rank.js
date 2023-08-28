@@ -19,6 +19,8 @@ const rankSchema = new mongoose.Schema({
     }
 })
 
+
+
 rankSchema.plugin(uniqueValidator)
 
 rankSchema.set('toJSON', {

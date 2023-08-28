@@ -37,5 +37,20 @@ module.exports = {
                 errorCode: 2104
             },
         }
+    },
+    admin: { // 3###
+        console: { // 31##
+            notUtilStart: { 
+                 errorCode: 3101,
+                 error: "Los comandos de AdminX deben comenzar con 'admin'"
+            },
+        },
+        rights: { // 32##
+            insufficientRights: {
+                errorCode: 3201,
+                error: "No tienes los permisos de administración necesarios para realizar esa acción"
+            }
+        }
     }
+
 }

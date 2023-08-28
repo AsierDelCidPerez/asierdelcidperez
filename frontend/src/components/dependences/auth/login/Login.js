@@ -1,7 +1,5 @@
 import { TextField, Link, Button, Box, FormControlLabel, Checkbox } from "@mui/material"
 import useUserService from "../../../../services/users"
-import uris from "../../../../urls/uris"
-import { useNotification } from "../../others/Notification"
 import {useDispatch} from 'react-redux'
 import { actOfSetUser } from "../../../../redux/reducers/user"
 import { useState } from "react"

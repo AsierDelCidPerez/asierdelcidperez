@@ -1,9 +1,6 @@
 import { TextField, Link, Button, Box, Checkbox, FormControlLabel } from "@mui/material"
 import useUserService from "../../../../services/users"
-import uris from "../../../../urls/uris"
-import { useNotification } from "../../others/Notification"
 import { validarContrasena, validarTexto, validarEmail} from "./dependences/validadores"
-import useAlert from "../../others/MyAlert"
 import { useState } from "react"
 import VerifyPage from "./dependences/VerifyEmail"
 

@@ -1,24 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
-import {Button, Card, CardContent, CardHeader, Typography} from '@mui/material'
-import uris from './settings/uris';
-import {useDispatch, useSelector} from 'react-redux'
-import { actOfSetAdmin } from './redux/reducers/admin';
-import useAdminService from './services/admin';
-import { useNotification } from './components/dependences/Notification';
-import {useEffect} from 'react'
-import { getUriParam } from './utils/uri';
 import { Route, Routes } from 'react-router-dom';
 import Auth from './components/main/Auth';
 import Dashboard from './components/main/Dashboard';
+import Logout from './components/main/Logout';
+import AdminUser from './components/main/AdminUser'
+import { useNavbar } from './components/main/Navbar';
+import { useEffect } from 'react';
+import ManageUser from './components/dependences/admin/ManageUser';
 
 const App = () => {
 
+  const [getNavbar, setVisible, setActiveElem] = useNavbar()
+
+  useEffect(() => {
+    setVisible(false)
+  }, [])
 
   return (
     <div>
+      {getNavbar()}
       <Routes>
-        <Route element={<Dashboard/>} path='/dashboard'/>
+        <Route element={<ManageUser setVisible={setVisible}/>} path="/dashboard/user/manage/:id"/>
+        <Route element={<AdminUser setVisible={setVisible} setActiveElem={setActiveElem}/>} path="/dashboard/user"/>
+        <Route element={<Dashboard setActiveElem={setActiveElem} setVisible={setVisible}/>} path="/dashboard"/>
+        <Route element={<Logout/>} path="/logout"/>
         <Route element={<Auth/>} path='/'/>
       </Routes>
     </div>

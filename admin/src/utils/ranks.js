@@ -16,10 +16,6 @@ const rights = {
         "renewSubscription", // Renovar suscripción
         "manageSubscription", // 
         "seeStatistics", // Ver estadísticas de uso de las suscripciones
-        "addTenant", // Agregar subtenant <-> si tiene feature "subTenant"
-        "deleteTenant", // Eliminar subtenant <-> si tiene feature "subTenant"
-        "assignSubscription", // Asignar suscripcion a un subtenant <-> si tiene feature "subTenant"
-        "blockTenant" // Bloquear subtenant <-> si tiene feature "subTenant"
     ],
     adminRank: [
         "assignRank", // Asignar un rango, solo se pueden asignar aquellos rangos menores al usuario en prioridad.
@@ -46,6 +42,15 @@ const rights = {
         "seePurchasesStatistics", // Ver estadísticas de las ventas de suscripciones
         "detainWeb", // Detener web durante un tiempo indefinido
         "updateWeb" // Aplicar contador debido a mantenimiento/actualización, podría conllevar detenimiento de web
+    ],
+    adminTenant: [
+        "addTenant", // Agregar subtenant <-> si tiene feature "subTenant"
+        "deleteTenant", // Eliminar subtenant <-> si tiene feature "subTenant"
+        "assignSubscription", // Asignar suscripcion a un subtenant <-> si tiene feature "subTenant"
+        "blockTenant", // Bloquear subtenant <-> si tiene feature "subTenant"
+        "listSubTenants", // Ver todos los subTenants
+        "readTenant" // Ver la información de un tenant
+        
     ]
 }
 
@@ -57,14 +62,24 @@ for(let key in rights){
 
 export const getEffectiveRanksOf = (...adminRank) => {
     const ranks = []
-    adminRank.forEach(rank => ranks.push(...rights[rank]))
+
+    for(let rank of adminRank){
+        if(rights[rank] === undefined){
+            ranks.push(rank)
+        }else{
+            ranks.push(...rights[rank])
+        }
+    }
     return ranks
 }
 
 export const includeAtLeastOneRank = (ranks, container) => {
     for(let i of ranks){
         for(let j of container){
-            if(i===j) return true
+            if(i===j) {
+                // console.log(`${i} || ${j}`)
+                return true
+            }
         }
     }
     return false

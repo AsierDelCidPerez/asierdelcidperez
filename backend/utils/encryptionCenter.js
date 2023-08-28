@@ -29,8 +29,8 @@ const recogerDatos = (datos, format={/*
 })
 */
 
-const decrypt = encrypted => {
+const decryptData = encrypted => {
     return myBank.decrypt(encrypted)
 }
 
-module.exports = {encryptData, decrypt, activarCifradoReposo, enviarDatos}
+module.exports = {encryptData, decryptData, activarCifradoReposo, enviarDatos}

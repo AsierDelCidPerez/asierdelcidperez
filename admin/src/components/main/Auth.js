@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom"
 import CardAuth from "../dependences/auth/CardAuth"
 
 const Auth = () => {
-    const admin = localStorage.getItem('adminToken')
   
     const myAdmin = useSelector(state => state.admin)
   
@@ -22,9 +21,11 @@ const Auth = () => {
   
 
     useEffect(() => {   
+      const admin = localStorage.getItem('adminToken')
+
       if(myAdmin !== null) navigate('/dashboard')
      
-      if(admin && myAdmin === null){
+      if(admin !== null){
         adminService.verifyRightsByToken(admin, ["admin", "interfacex"]).then(res => {
             // console.log(res.data)
           dispatch(actOfSetAdmin(res.data))
@@ -35,7 +36,8 @@ const Auth = () => {
             isSuccess: false
           })
         })
-      }else if(!admin){
+      }else if(admin === null){
+        console.log(getUriParam('validated'))
         if(getUriParam('validated') === "true"){
           const recordar = getUriParam('recordar')
           // console.log(recordar)
@@ -62,12 +64,15 @@ const Auth = () => {
             setNotification({notification: e?.response?.data?.error, isSuccess: false})
             console.error(e)
           })
+          window.history.pushState(null, "/")
         }
       }
     }, [])
 
     return (
+      <div style={{width: '100vw', height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
         <CardAuth getNotification={getNotification}/>
+        </div>
     )
 }
 

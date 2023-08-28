@@ -1,4 +1,6 @@
 
-const urlParams = new URLSearchParams(window.location.search)
 
-export const getUriParam = name => urlParams.get(name)
+export const getUriParam = name => {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get(name)
+}

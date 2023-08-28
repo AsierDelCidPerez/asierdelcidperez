@@ -795,6 +795,7 @@ userRouter.post('/sign-in', async (req, res) => {
             // El tenant al que se registra tiene flux y mfa activado
             const value = {
                 name: body.name,
+                createdOn: new Date(),
                 apellidos: body.apellidos,
                 email: body.email,
                 passwordHash,
@@ -830,6 +831,7 @@ userRouter.post('/sign-in', async (req, res) => {
                 imageIcon: ""
             })
             await myUser.save()
+            
             // const myFinalUser = await user.findOne({email: body.email, tenant: root_token.id})
             await registrarUsuarioEnTenant(myUser, sub)
             res.status(200).send({success: {

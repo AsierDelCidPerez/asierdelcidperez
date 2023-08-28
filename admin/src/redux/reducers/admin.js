@@ -23,6 +23,13 @@ export const actOfSetAdmin = ({tokenAdmin, name, apellidos, email, imageIcon, ri
     }
 }
 
+export const actOfLogOut = () => {
+    return {
+        type: "SET_ADMIN",
+        admin: null
+    }
+}
+
 
 export default adminReducer
 

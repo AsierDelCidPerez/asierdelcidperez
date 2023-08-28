@@ -12,7 +12,7 @@ const CardAuth = ({getNotification}) => {
           <Card sx={{ maxWidth: 345 }}>        
             <CardContent>
               <div style={{display: 'flex', justifyContent: 'center'}}>
-                <img src="/logoColor.png" width="28%"/>
+                <img src="/admin.png" width="28%"/>
               </div>
               <Typography sx={{textAlign: 'center'}} gutterBottom variant="h5" component="div"> AdminX </Typography>
               <div>
