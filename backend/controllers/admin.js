@@ -6,7 +6,7 @@ const adminRouter = require('express').Router()
 const errors = require('./helpers/errors')
 const { sumarDias } = require('../../admin/src/utils/functions/dates/dates')
 const config = require('../settings/config')
-const { listUsers, readUser } = require('./mediators/admin')
+const { listUsers, readUser, editUser } = require('./mediators/admin')
 const ranks = require('../utils/ranks')
 
 const validarSubscription = async (req=null, res=null, subscription=null, origin=true) => {
@@ -147,7 +147,7 @@ adminRouter.post('/admin-console', async(req, res) => {
         }
     */
 
-    const cmdlet = body.cmdlet.split(" ")
+    const cmdlet = body.cmdlet.split("|")
 
     const revisarThatIncludesAllRights = (res, ...rights) => {
         const util = ranks.getEffectiveRanksOf(adminToken.rights)
@@ -190,6 +190,20 @@ adminRouter.post('/admin-console', async(req, res) => {
             await readUser(configConsole, adminToken, res, ...body?.params) 
             break
         }
+        case "editUser": {
+            switch(cmdlet[2]){
+                case "nameAndLastName": {
+                    await editUser(configConsole, adminToken, res, ["name", "apellidos"],...body?.params)
+                    break
+                }
+            }
+
+            break
+        }
+        default: {
+            res.status(400).send({date: new Date()}) // Mandar error por comando no encontrado
+            break
+        }
     }
 
 })
@@ -221,7 +235,8 @@ adminRouter.post('/verify-rights', async(req, res) => {
         date: new Date(),
         rights: actions,
         subscription,
-        ip: adminToken.ip
+        ip: adminToken.ip,
+        rank: myUser.rank
     }, process.env.SECRET)
 
     res.status(200).send({tokenAdmin,rights:actions,name:adminToken.value.name, apellidos: adminToken.value.apellidos, email: adminToken.value.email, imageIcon: adminToken.value.imageIcon, rank: myUser.rank})

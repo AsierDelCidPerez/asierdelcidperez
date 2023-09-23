@@ -15,6 +15,7 @@ const Tenant = require('../model/Tenant')
 const { registrarUsuarioEnTenant } = require('./tenants')
 const {enviarMensaje, validarEmail} = require('./emails')
 const AuthToken = require('../model/AuthToken')
+const errors = require('./helpers/errors')
 
 
 const generateTokenForValidation = async (subId) => {
@@ -135,6 +136,7 @@ userRouter.get('/exists', async(req, res) => {
 })
 
 userRouter.put('/changePassword', async(req, res) => {
+    try{
     const {useSubscription, sub} = await validarSubscription(req, res)
     if(useSubscription === undefined) return
     await useSubscription()
@@ -148,6 +150,10 @@ userRouter.put('/changePassword', async(req, res) => {
 
     const myUser = await user.findOne({email: value.email, tenant: sub.tenant.id})
     await cambiarPassword(req, res, myUser)
+}catch(e) {
+    console.error(e)
+    res.status(500).send({date: new Date()}) // Error general
+}
 })
 
 userRouter.put('/changePasswordByRemember', async(req, res) => {
@@ -274,6 +280,7 @@ userRouter.post('/rememberPassword', async(req, res) => {
 })
 
 userRouter.put('/edit', async(req, res) => {
+    try{
     const {useSubscription, sub} = await validarSubscription(req, res)
     await validarSubscription(req, res)
     const token = jwt.verify(req.get('Authorization'), process.env.SECRET)
@@ -319,11 +326,7 @@ userRouter.put('/edit', async(req, res) => {
     }
 
     const newToken = jwt.sign(getTokenByUser(myUser, token.ip), process.env.SECRET)
-    try{
     await myUser.save()
-    }catch(e) {
-        ServiceWorkerRegistration.status(500).send({error: 'Se ha producido un error', date: new Date()})
-    }
     res.status(202).send({changed: true, 
         token: newToken,
         newData: {
@@ -333,6 +336,11 @@ userRouter.put('/edit', async(req, res) => {
             imageIcon: myUser.imageIcon,
         }
     })
+    }catch(e) {
+        console.error(e)
+        res.status(500).send({date: new Date()}) // Error general
+    }
+   
 })
 
 userRouter.post('/auth/token', async(req, res) => {
@@ -522,6 +530,7 @@ userRouter.post('/auth/login', async(req, res) => {
 
 
 userRouter.put('/edit/:ajuste', async(req, res) => {
+    try{
     const {useSubscription, sub} = await validarSubscription(req, res)
     await validarSubscription(req, res)
     const ajuste = req.params.ajuste
@@ -654,6 +663,10 @@ userRouter.put('/edit/:ajuste', async(req, res) => {
             apellidos: myUser.apellidos
         }})
     }
+}catch(e){
+    console.error(e)
+    res.status(500).send({date: new Date()}) // Error general
+}
 })
 
 userRouter.post('/login', async(req, res) => {
@@ -715,59 +728,64 @@ const generarCodigo = longitud => {
 userRouter.post('/verify-sign-in', async(req, res) => {
     const {useSubscription, sub} = await validarSubscription(req, res)
     const {tokenValidacion, vCodigo} = req.body
-    const {codigo, value, date} = jwt.verify(tokenValidacion, process.env.SECRET)
+    try{
+        const {codigo, value, date} = jwt.verify(tokenValidacion, process.env.SECRET)
+        await useSubscription()
 
-    await useSubscription()
-
-    if(tokenValidacion.length === 0 || vCodigo.length === 0){
-        res.status(400).send({error: 'Datos incorrectos', date: new Date()})
-        return
-    }
-
-    if(!subValidFlux(sub)){
-        res.status(401).send({error: 'Su suscripción no incluye la API de CORE (flux). Actualice para incluirla.', date: new Date()})
-        return
-    }
-
-    if(!subValidEmail(sub)){
-        res.status(401).send({error: 'Su suscripción no incluye la API de email. Actualice para incluirla.', date: new Date()})
-        return
-    }
-
-    if(!(await uniqueForTenant(value.email, sub))){
-        // console.log('Ha entrado por aqui')
-        res.status(400).send({error: 'El email ya está en uso.', date: new Date()})
-        return
-    }
-
-    // console.log(vCodigo + " | " + codigo)
-
-    if(await bcrypt.compare(vCodigo, codigo)){
-        if(new Date() <= new Date(new Date(date).getTime()+1800000)){
-            const myUser = new user({
-                ...value
-            })
-            await myUser.save()
-            // const myFinalUser = await user.findOne({email: body.email, tenant: root_token.id})
-            await registrarUsuarioEnTenant(myUser, sub)
-            res.status(200).send({
-                verified: true,
-                type: 'Se ha registrado correctamente',
-                code: 200,
-                email: value.email
-            })
-            
-        }else{
-            const orCodigo = generarCodigo(6)
-            const newCodigo = await bcrypt.hash(orCodigo, 10)
-            const tokenValidacion = jwt.sign({value, codigo: newCodigo, date: new Date()}, process.env.SECRET)
-            const html = `<p>Hemos detectado que desea registrarse con este correo: <strong>${value.email}</strong>. Para ello necesitar&aacute; hacer uso del c&oacute;digo de verificaci&oacute;n que le ser&aacute; solicitado por la p&aacute;gina web. El siguiente c&oacute;digo de seguridad es de un solo uso, es solamente v&aacute;lido durante los 30 minutos posteriores a su generaci&oacute;n. Al ser un c&oacute;digo confidencial, no debe compartirse con nadie. A continuaci&oacute;n encuentra el c&oacute;digo:</p><br/><p style="text-align: center;"><span style="font-size:26px;"><strong>${orCodigo}</strong></span></p><br/><p>Si necesita ayuda de cualquier tipo, no dude en ponerse en contacto con nosotros mediante nuestro correo: <a href="mailto:general.adelcidp@gmail.com?subject=Verificaci%C3%B3n%20del%20correo&amp;body=Necesito%20ayuda%20con%20la%20verificaci%C3%B3n%20del%20correo%20electr%C3%B3nico%20a%20la%20hora%20de%20registrar%20mi%20cuenta%20en%20la%20web.">general.adelcidp@gmail.com</a>.</p><br/><p>Muchas gracias.</p>`
-            await enviarMensaje(null, value.email, 'Verificación de email', null, html)
-            res.status(401).send({verify: true, error: 'El código de verificación ha expirado. Acabamos de enviar otro.', tokenValidacion})
+        if(tokenValidacion.length === 0 || vCodigo.length === 0){
+            res.status(400).send({error: 'Datos incorrectos', date: new Date()})
+            return
         }
-    }else{
-        res.status(401).send({error: 'El código de verificación es incorrecto', date: new Date()})
+    
+        if(!subValidFlux(sub)){
+            res.status(401).send({error: 'Su suscripción no incluye la API de CORE (flux). Actualice para incluirla.', date: new Date()})
+            return
+        }
+    
+        if(!subValidEmail(sub)){
+            res.status(401).send({error: 'Su suscripción no incluye la API de email. Actualice para incluirla.', date: new Date()})
+            return
+        }
+    
+        if(!(await uniqueForTenant(value.email, sub))){
+            // console.log('Ha entrado por aqui')
+            res.status(400).send({error: 'El email ya está en uso.', date: new Date()})
+            return
+        }
+    
+        // console.log(vCodigo + " | " + codigo)
+    
+        if(await bcrypt.compare(vCodigo, codigo)){
+            if(new Date() <= new Date(new Date(date).getTime()+1800000)){
+                const myUser = new user({
+                    ...value
+                })
+                await myUser.save()
+                // const myFinalUser = await user.findOne({email: body.email, tenant: root_token.id})
+                await registrarUsuarioEnTenant(myUser, sub)
+                res.status(200).send({
+                    verified: true,
+                    type: 'Se ha registrado correctamente',
+                    code: 200,
+                    email: value.email
+                })
+                
+            }else{
+                const orCodigo = generarCodigo(6)
+                const newCodigo = await bcrypt.hash(orCodigo, 10)
+                const tokenValidacion = jwt.sign({value, codigo: newCodigo, date: new Date()}, process.env.SECRET)
+                const html = `<p>Hemos detectado que desea registrarse con este correo: <strong>${value.email}</strong>. Para ello necesitar&aacute; hacer uso del c&oacute;digo de verificaci&oacute;n que le ser&aacute; solicitado por la p&aacute;gina web. El siguiente c&oacute;digo de seguridad es de un solo uso, es solamente v&aacute;lido durante los 30 minutos posteriores a su generaci&oacute;n. Al ser un c&oacute;digo confidencial, no debe compartirse con nadie. A continuaci&oacute;n encuentra el c&oacute;digo:</p><br/><p style="text-align: center;"><span style="font-size:26px;"><strong>${orCodigo}</strong></span></p><br/><p>Si necesita ayuda de cualquier tipo, no dude en ponerse en contacto con nosotros mediante nuestro correo: <a href="mailto:general.adelcidp@gmail.com?subject=Verificaci%C3%B3n%20del%20correo&amp;body=Necesito%20ayuda%20con%20la%20verificaci%C3%B3n%20del%20correo%20electr%C3%B3nico%20a%20la%20hora%20de%20registrar%20mi%20cuenta%20en%20la%20web.">general.adelcidp@gmail.com</a>.</p><br/><p>Muchas gracias.</p>`
+                await enviarMensaje(null, value.email, 'Verificación de email', null, html)
+                res.status(401).send({verify: true, error: 'El código de verificación ha expirado. Acabamos de enviar otro.', tokenValidacion})
+            }
+        }else{
+            res.status(401).send({error: 'El código de verificación es incorrecto', date: new Date()})
+        }
+    }catch(e){
+        res.status(401).send({date: new Date()}) // firma inválida
+        return
     }
+   
 })
 
 userRouter.post('/sign-in', async (req, res) => {
@@ -795,7 +813,6 @@ userRouter.post('/sign-in', async (req, res) => {
             // El tenant al que se registra tiene flux y mfa activado
             const value = {
                 name: body.name,
-                createdOn: new Date(),
                 apellidos: body.apellidos,
                 email: body.email,
                 passwordHash,
@@ -805,8 +822,12 @@ userRouter.post('/sign-in', async (req, res) => {
                     reason: ""
                 },
                 tenant: sub.tenant.id,
-                imageIcon: ""
+                imageIcon: "",
+                createdOn: new Date()
             }
+
+            console.log(value)
+
             const orCodigo = generarCodigo(6)
             const codigo = await bcrypt.hash(orCodigo, 10)
             const tokenValidacion = jwt.sign({value, codigo, date: new Date()}, process.env.SECRET)
@@ -823,6 +844,7 @@ userRouter.post('/sign-in', async (req, res) => {
                 email: body.email,
                 passwordHash,
                 rank: "usuario",
+                createdOn: new Date(),
                 blocked: {
                     value: -1,
                     reason: ""
@@ -841,7 +863,7 @@ userRouter.post('/sign-in', async (req, res) => {
             }})
             }
     }else{
-        res.status(400).send({error: 'Datos introducidos incorrectos', date: new Date()})
+        res.status(400).send({...errors.data.formatData.malformatted, date: new Date()})
     }
 })
 

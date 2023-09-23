@@ -14,11 +14,11 @@ const useAdminService = () => {
 
     const adminConsole = {
         listUsers: services => {
-            const cmdlet = "admin listUsers"
+            const cmdlet = "admin|listUsers"
             return axios.post(`${uri}/admin-console`, {adminToken, cmdlet,services, params: []})
         },
         readUser: (id, services) => {
-            const cmdlet = "admin readUser"
+            const cmdlet = "admin|readUser"
             return axios.post(`${uri}/admin-console`, {adminToken, cmdlet, services, params: [id]})
         }
     }

@@ -12,6 +12,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    status: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+
     email: {
         type: String, // El email será único por tenant
         required: true,
@@ -36,12 +43,16 @@ const userSchema = new mongoose.Schema({
     },
     blocked: {
         value: {
-            type: Number,
+            type: mongoose.Schema.Types.Number,
             required: true
         },
         reason: {
             type: String
         }
+    },
+    createdOn: {
+        type: mongoose.Schema.Types.Date,
+        required: true
     }
 
 })

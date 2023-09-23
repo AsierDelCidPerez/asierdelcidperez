@@ -6,6 +6,8 @@ const hasAuthorization = async (myRank, externalUser, adminToken) => {
     const mRank = await Rank.findOne({nameId: myRank})
     const exRank = await Rank.findOne({nameId: externalUser.rank})
 
+    
+
     const myTenant = await Tenant.findById(adminToken.tenant)
     const exTenant = await Tenant.findById(externalUser.tenant)
     const myChildren = await getChildrenArrayPlain(myTenant.nameId)

@@ -49,8 +49,44 @@ module.exports = {
             insufficientRights: {
                 errorCode: 3201,
                 error: "No tienes los permisos de administración necesarios para realizar esa acción"
+            },
+            keyNotAllowed: key => {
+                return {
+                    errorCode: 3202,
+                    error: `La clave ${key} no está permitida para su edición, por lo menos no desde esta opción`,
+                    helper: {
+                        cause: "Normalmente la causa de este error es usar el comando 'admin editUser <...>' utilizando un campo de usuario que o bien no existe o no está de entre los permtidos.",
+                        fix: {
+                            explanation: "Para solucionar este error simplemente debe editar los campos permitidos para 'editUser' que son los siguientes indicados en helper.fix.allowedKeys",
+                            allowedKeys, // 
+                            examples: [
+                                "$admin|editUser|nameAndLastName|nothing|García Trueno"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+        
+    },
+    data: { // 4###
+        formatData: { // 41##
+            malformattedEmail: {
+                errorCode: 4101,
+                error: "El email provisto no cumple el formato correspondiente."
+            },
+            malformattedPassword: {
+                errorCode: 4102,
+                error: "La contraseña provista no cumple el formato correspondiente."
+            },
+            malformattedTextField: {
+                errorCode: 4103,
+                error: "El texto provisto no cumple el formato correspondiente."
+            },
+            malformatted: {
+                errorCode: 4104,
+                error: "El campo no se adecúa al formato correspondiente."
             }
         }
     }
-
 }
