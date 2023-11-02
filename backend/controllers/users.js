@@ -49,7 +49,9 @@ const getTokenByUser = (usuario, ip) => {
             tenant: usuario.tenant.nameId, 
             rank: usuario.rank, 
             blocked: usuario.blocked,
-            imageIcon: usuario.imageIcon
+            imageIcon: usuario.imageIcon,
+            createdOn: usuario.createdOn,
+            status: usuario.status
         }, 
         date: new Date(), 
         ip
@@ -315,6 +317,8 @@ userRouter.put('/edit', async(req, res) => {
     }
     
     console.log(dataUser)
+
+    console.log("HOLAAA")
 
     const myUser = await user.findOneAndUpdate({email: token.value.email, tenant: sub.tenant.id}, dataUser, {new: true})
     if(myUser === false) {
@@ -707,9 +711,9 @@ userRouter.post('/login', async(req, res) => {
             const ip = await bcrypt.hash(req.ip, 10)
             const token = jwt.sign(getTokenByUser(usuario, ip), process.env.SECRET)
             if(subValidFlux(sub)){
-                res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
+                res.status(200).send({token, name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon,createdOn: usuario.createdOn,status:usuario.status})
             }else{
-                res.status(200).send({name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon})
+                res.status(200).send({name: usuario.name, apellidos: usuario.apellidos, email: usuario.email, imageIcon: usuario.imageIcon,createdOn: usuario.createdOn,status:usuario.status})
             }
     }else{
         res.status(404).send({error: 'La contraseña es incorrecta', date: new Date()})
