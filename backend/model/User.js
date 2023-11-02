@@ -14,9 +14,22 @@ const userSchema = new mongoose.Schema({
     },
 
     status: {
+
+        isVerified: {
+            type: Boolean,
+            required: true,
+        },
+
+        isAdmin: {
+            type: Boolean, 
+            required: true
+        }
+
+        /*
         type: Number,
         required: true,
         default: 0
+        */
     },
 
     email: {
