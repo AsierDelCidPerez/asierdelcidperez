@@ -257,6 +257,19 @@ const data = [
       'C#': 5.68,
       'Python': 13.58,
     },
+    {
+      name: "2023",
+      'Java': 7.99,
+      'C': 11.44,
+      'Assembly Language': 1.11,
+      'Visual Basic': 1.82,
+      'C++': 10.01,
+      'PHP': 1.11,
+      'JavaScript': 2.9,
+      'SQL': 1.61,
+      'C#': 7.3,
+      'Python': 13.86,
+    }
   ];
   
   const linesForChart = [
