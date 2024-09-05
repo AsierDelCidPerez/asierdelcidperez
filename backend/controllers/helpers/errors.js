@@ -1,5 +1,8 @@
 
 module.exports = {
+    generic: {
+        
+    },
     token: { // 1###
         invalid: { // 14##
             invalidToken: {

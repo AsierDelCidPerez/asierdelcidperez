@@ -8,11 +8,13 @@ const { sumarDias } = require('../../admin/src/utils/functions/dates/dates')
 const config = require('../settings/config')
 const { listUsers, readUser, editUser } = require('./mediators/admin')
 const ranks = require('../utils/ranks')
+const { validarEmail } = require('./emails')
 
 const validarSubscription = async (req=null, res=null, subscription=null, origin=true) => {
     // Si origin es true entonces no se toma en cuenta el origen de la suscripción al revisarlo.
     const {sub, isUsable, useSubscription} = subscription===null ? await getFunctionsForSubscription(req.get('Subscription')) : await getFunctionsForSubscription(subscription)
     
+    /** Devuelve true si no incluye alguna feature. También incluye el mensaje de error. */
     const revisarFeatures = (features=[]) => {
         for(let k of features){
             if(!sub.tenant.features.includes(k)) {
@@ -205,7 +207,6 @@ adminRouter.post('/admin-console', async(req, res) => {
             break
         }
     }
-
 })
 
 adminRouter.post('/verify-rights', async(req, res) => {
@@ -245,6 +246,34 @@ adminRouter.post('/verify-rights', async(req, res) => {
     res.status(400).send({error: "Ha ocurrido un error inesperado",e,date: new Date()})
     return
 }
+})
+
+adminRouter.post("/verificar-email", async(req, res) => {
+    try {
+        const services = req.body.services
+        const adminToken = jwt.verify(req.body.adminToken, process.env.SECRET)
+        const subscription = adminToken.sub
+
+        const {useSubscription, sub, revisarFeatures} = await validarSubscription(req, res, sub)
+        await useSubscription()
+        if(revisarFeatures(services, res)) return
+
+        const myUser = await User.findOne({email: adminToken.value.email, tenant: sub.tenant.id})
+
+        const diRank = await Rank.findOne({nameId: myUser.rank})
+
+        const actions = ranks.getEffectiveRanksOf(diRank.allowedActions)
+
+        ranks.includeAtLeastOneRank(actions, ["editUser", "operateUser"])
+
+        // Seguir por aquí (está sin acabar)
+
+        await validarEmail()
+
+    }catch(e){
+        console.log(e)
+        res.status(400).send({...errors.token.invalid.invalidTokenAdmin, date: new Date()})
+    }
 })
 
 

@@ -73,6 +73,7 @@ const getEffectiveRanksOf = (...adminRank) => {
     return ranks
 }
 
+/** ¿Incluye ranks al menos un elemento de container? */
 const includeAtLeastOneRank = (ranks, container) => {
     for(let i of ranks){
         for(let j of container){

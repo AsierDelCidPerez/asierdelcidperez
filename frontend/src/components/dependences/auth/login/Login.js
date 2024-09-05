@@ -26,6 +26,7 @@ const LoginForm = ({toggleLikeRegistering, notification, sub=null, onlyLogin=fal
     const recordar = event.target.recordarCredenciales.checked
     // console.log("Recordando " + recordar)
     try{
+      console.log(onlyLogin)
     if(onlyLogin){
        const logData = {email: event.target.email.value, password: event.target.password.value, tenant: !event.target.tenant.value  ? subscription : event.target.tenant.value}
         if(tokenAuth === "null"){

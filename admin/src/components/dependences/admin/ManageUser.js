@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Container, Typography } from "@mui/material"
+import { Box, Button, Card, CardContent, Container, Grid, Typography } from "@mui/material"
 import { useMatch, useParams } from "react-router-dom"
 import CardUser from "./CardUser"
 import { useEffect, useState } from "react"
@@ -91,6 +91,16 @@ const ManageUser = ({setVisible}) => {
                 </Box>
                 {getEstado()}
                 <TableUser user={user} editEvents={editEvents}/>
+
+                <br/>
+
+                <Grid container spacing={2}>
+                    <Grid item xs={4}><Button variant="contained" fullWidth>Verificar email</Button></Grid>
+                    <Grid item xs={4}><Button variant="contained" fullWidth>Cambiar contraseña</Button></Grid>
+                    <Grid item xs={4}><Button variant="contained" fullWidth>Cambiar email</Button></Grid>
+
+                </Grid>
+
             </Container>
         </div>
     )
